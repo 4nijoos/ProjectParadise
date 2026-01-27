@@ -1,6 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
+#include "Data/Enums/GameEnums.h"
 #include "DT_UnitStructs.generated.h"
 
 class USkeletalMesh;
@@ -226,6 +227,68 @@ USTRUCT(BlueprintType)
 struct FEnemyStats : public FTableRowBase
 {
 	GENERATED_BODY()
+
+	// =========================================================
+	// 1. 기본 정보 (Basic Info)
+	// =========================================================
+
+	/**
+	 * @brief 적 타입
+	 * @details 근거리, 원거리, 보스 등 AI 행동 패턴의 기준이 됩니다.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Info")
+	EUnitType EUnitType;
+
+	// =========================================================
+	// 2. 전투 스탯 (Combat Stats)
+	// =========================================================
+
+	/**
+	 * @brief 최대 체력 (Max HP)
+	 * @details 스폰 시 Health Attribute의 초기값으로 설정됩니다.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float MaxHP;
+
+	/**
+	 * @brief 공격력 (Attack Power)
+	 * @details 평타 및 스킬 데미지 계산의 기초가 되는 값입니다.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float AttackPower;
+
+	/**
+	 * @brief 방어력 (Defense)
+	 * @details 데미지 감소율 계산에 사용됩니다. (예: 방어력 100당 데미지 10% 감소 등 공식 적용)
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float Defense;
+
+	/**
+	 * @brief 공격 속도 / 쿨타임 (Attack Speed)
+	 * @details 초 단위(Seconds)입니다. 값이 낮을수록 공격을 빠르게 합니다. (예: 1.5 = 1.5초마다 공격)
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float AttackSpeed;
+
+	// =========================================================
+	// 3. AI 및 이동 (AI & Movement)
+	// =========================================================
+
+	/**
+	 * @brief 평상시 이동 속도 (Move Speed)
+	 * @details 언리얼 단위(cm/s)입니다. 보통 걷기는 300~400, 달리기는 600 정도입니다.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+	float MoveSpeed;
+
+	/**
+	 * @brief 사거리 (Attack Range)
+	 * @details 이 거리 안에 타겟이 들어오면 이동을 멈추고 공격을 시도합니다.
+	 * @note 근거리는 보통 100~150, 원거리는 600~1000 정도를 사용합니다.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+	float AttackRange;
 };
 
 USTRUCT(BlueprintType)
