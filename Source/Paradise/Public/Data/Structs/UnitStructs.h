@@ -2,7 +2,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
 #include "Data/Enums/GameEnums.h"
-#include "DT_UnitStructs.generated.h"
+#include "UnitStructs.generated.h"
 
 class USkeletalMesh;
 class UAnimInstance;
@@ -169,6 +169,10 @@ struct FAIUnitStats : public FUnitBaseStats
 	float AttackRange;
 };
 
+/**
+ * @struct FFamiliarAssets
+ * @brief 몬스터 전용 스탯 테이블 구조체
+ */
 USTRUCT(BlueprintType)
 struct FEnemyStats : public FAIUnitStats
 {
@@ -176,6 +180,10 @@ struct FEnemyStats : public FAIUnitStats
 
 };
 
+/**
+ * @struct FFamiliarAssets
+ * @brief 퍼밀리어 전용 스탯 테이블 구조체
+ */
 USTRUCT(BlueprintType)
 struct FFamiliarStats : public FAIUnitStats
 {
@@ -361,11 +369,10 @@ struct FEnemyAssets : public FAIUnitAssets
 
 /**
  * @struct FFamiliarAssets
- * @brief 퍼밀리어(소환수) 전용 에셋 테이블 구조체
+ * @brief 퍼밀리어 전용 에셋 테이블 구조체
  */
 USTRUCT(BlueprintType)
 struct FFamiliarAssets : public FAIUnitAssets
 {
 	GENERATED_BODY()
 };
-
