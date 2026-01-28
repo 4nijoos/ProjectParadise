@@ -103,6 +103,8 @@ UAbilitySystemComponent* APlayerBase::GetAbilitySystemComponent() const
 	return LinkedPlayerData.IsValid() ? LinkedPlayerData->GetAbilitySystemComponent() : nullptr;
 }
 
+
+
 void APlayerBase::Die()
 {
     if (LinkedPlayerData.IsValid())
@@ -134,3 +136,10 @@ void APlayerBase::OnMoveInput(const FInputActionValue& InValue)
     //카메라의 오른쪽 방향으로 (화면상 좌우)
     AddMovementInput(CameraRight, MovementVector.X);
 }
+
+void APlayerBase::OnAttackInput(const FInputActionValue& InValue)
+{
+    //일단 기본공격
+}
+
+
