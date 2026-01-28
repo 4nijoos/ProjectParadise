@@ -21,6 +21,10 @@ APlayerData::APlayerData()
 	EquipmentComponent = CreateDefaultSubobject<UCMP_Equipment>(TEXT("EquipmentComponent"));
 }
 
+void APlayerData::InitFromDataAsset(UPrimaryDataAsset* InData)
+{
+}
+
 void APlayerData::OnDeath()
 {
 	if (bIsDead) return;

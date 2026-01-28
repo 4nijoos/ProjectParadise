@@ -32,7 +32,18 @@ public:
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
 	/*
-	 * @brief 죽으면 호출 될 함수 
+	 * @brief 데이터 에셋(혹은 테이블)을 받아 스탯과 스킬을 초기화하는 함수
+	 * @details [변경 예정] 현재는 범용 UPrimaryDataAsset을 받고 있지만,
+	 * 추후 기획 확정에 따라 'FDataTableRowHandle(데이터 테이블)' 또는 구체적인 DataAsset타입으로 변경될 수 있습니다.
+	 * @param InData 초기화에 사용할 데이터 원본
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Init")
+	void InitFromDataAsset(UPrimaryDataAsset* InData);
+
+
+	/*
+	 * @brief 육체가 사망했을 때 호출되는 함수
+	 * @details 부활 타이머를 가동하고 상태를 Dead로 변경합니다.
 	 */
 	UFUNCTION()
 	void OnDeath();
@@ -44,18 +55,24 @@ public:
 	void OnRespawnFinished();
 public:
 
-	/*
-	 * @brief 플레이어 장비 컴포넌트
+	/* * 장비 관리 컴포넌트
+	 * @details 인게임에서 착용 중인 장비의 로직과 데이터를 처리합니다.
 	 */
 	UPROPERTY(VisibleAnywhere, Category = "Equipment")
 	TObjectPtr<class UCMP_Equipment> EquipmentComponent = nullptr;
 
 
-	/*
-	 * @brief 참조중인 캐릭터 아바타
+	/* * 현재 빙의 중인 육체 (약한 참조)
+	 * @details PlayerBase는 언제든 파괴될 수 있으므로 WeakPtr로 참조합니다.
 	 */
 	UPROPERTY()
-	TObjectPtr<class ACharacterBase> CurrentAvatar = nullptr;
+	TWeakObjectPtr<class ACharacterBase> CurrentAvatar = nullptr;
+
+	/* * 원본 데이터 에셋 (캐싱용)
+	 * @details InitFromDataAsset으로 들어온 원본 데이터를 저장해둡니다.
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
+	TObjectPtr<UPrimaryDataAsset> SourceDataAsset;
 
 	/*
 	 * @brief 죽었는지 Bool값
@@ -72,13 +89,14 @@ public:
 
 protected:
 	/*
-	 * @brief 플레이어 ASC
+	 * @brief 플레이어 ASC 컴포넌트
 	 */
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
-	/*
-	 * @brief 실제 어트리뷰트셋 클래스로 형식 변경예정
+	/* * GAS 스탯 관리용 어트리뷰트 셋
+	 * @details [변경 예정] 현재는 기본 UAttributeSet이지만,
+	 * 추후 구체적인 커스텀 클래스로 타입을 변경할 예정입니다.
 	 */
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
