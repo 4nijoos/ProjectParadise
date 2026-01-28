@@ -10,9 +10,8 @@
 void APC_InGameController::BeginPlay()
 {
 	Super::BeginPlay();
-    
-	
 
+    //입력 매핑 컨텍스트 연결
     if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
     {
         if (DefaultMappingContext)
@@ -21,7 +20,6 @@ void APC_InGameController::BeginPlay()
         }
     }
 
-    InitializeSquad();
 }
 
 void APC_InGameController::SetupInputComponent()
@@ -35,6 +33,27 @@ void APC_InGameController::RequestSwitchPlayer(int32 PlayerIndex)
 	
 }
 
-void APC_InGameController::InitializeSquad()
+void APC_InGameController::InitializeSquadPawns()
 {
 }
+
+void APC_InGameController::PossessAI(APlayerBase* TargetCharacter)
+{
+}
+
+void APC_InGameController::OnInputSwitchHero1(const FInputActionValue& Value)
+{
+    //입력 액션 바인딩 함수 후에 UI 모바일 버튼으로 바인딩예정
+}
+
+void APC_InGameController::OnInputSwitchHero2(const FInputActionValue& Value)
+{
+    //입력 액션 바인딩 함수 후에 UI 모바일 버튼으로 바인딩예정
+}
+
+void APC_InGameController::OnInputSwitchHero3(const FInputActionValue& Value)
+{
+    //입력 액션 바인딩 함수 후에 UI 모바일 버튼으로 바인딩예정
+}
+
+
