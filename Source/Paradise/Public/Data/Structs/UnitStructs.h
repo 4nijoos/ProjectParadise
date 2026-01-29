@@ -16,7 +16,7 @@ class USoundBase;
 
 /**
  * @struct FUnitBaseStats
- * @brief 모든 유닛(플레이어, 몬스터, 소환수)의 공통 기초 능력치를 정의하는 구조체입니다.
+ * @brief 모든 유닛(플레이어, 몬스터, 소환수)의 공통 기초 능력치를 정의하는 부모 구조체
  * @details GAS AttributeSet의 초기화 데이터로 사용됩니다.
  * 'Base' 접두사가 붙은 수치는 장비나 버프가 적용되지 않은 순수 스탯을 의미합니다.
  */
@@ -74,7 +74,7 @@ struct FUnitBaseStats : public FTableRowBase
 
 /**
  * @struct FCharacterStats
- * @brief 플레이어 캐릭터의 '성장 규칙'과 '고유 스킬' 데이터를 정의하는 구조체입니다.
+ * @brief 플레이어 캐릭터의 '성장 규칙'과 '고유 스킬' 데이터를 정의하는 구조체
  * @details FUnitBaseStats를 상속받아 기본 스탯을 포함하며, 레벨업 시 상승하는 수치(Per Level)와 궁극기 설정이 추가되었습니다.
  * 로비(내 정보)와 인게임(스탯 초기화)에서 공통으로 사용되는 핵심 데이터입니다.
  */
@@ -86,6 +86,14 @@ struct FCharacterStats : public FUnitBaseStats
 	// =========================================================
 	//  성장 스탯 (Combat Stats)
 	// =========================================================
+
+	/**
+	 * @brief 레벨업 성장 테이블 ID (Level Up / Growth ID)
+	 * @details 캐릭터가 다음 레벨로 가기 위한 '필요 경험치량'이나 '소모 재화'가 정의된 테이블의 RowName입니다.
+	 * DT_CharacterLevelUp 테이블을 참조합니다.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Growth Info")
+	FName LevelUpCostId;
 
 	/**
 	 * @brief 레벨 업 당 최대 체력 증가량 (Growth Max HP)
@@ -193,7 +201,7 @@ struct FFamiliarStats : public FAIUnitStats
 
 /**
  * @struct FUnitBaseAssets
- * @brief 모든 유닛(플레이어, 몬스터, 퍼밀리어)의 공통 리소스 정의
+ * @brief 모든 유닛(플레이어, 몬스터, 퍼밀리어)의 공통 리소스 정의한 부모 구조체
  * @details 외형(Mesh), 기본 애니메이션(AnimBP), 생존 반응(Hit/Dead) 등 필수적인 에셋을 포함합니다.
  */
 USTRUCT(BlueprintType)
@@ -219,18 +227,7 @@ public:
 	TSubclassOf<UAnimInstance> AnimBlueprint;
 
 	// =========================================================
-	//  GAS (Common)
-	// =========================================================
-
-	/**
-	 * @brief 평타 어빌리티 (Basic Attack)
-	 * @details 쿨타임이 없거나 매우 짧은 기본 공격입니다. AI의 경우 스킬 쿨타임일 때 사용하는 '패시브성' 공격입니다.
-	 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GAS|Common")
-	TSubclassOf<UGameplayAbility> BasicAbility;
-
-	// =========================================================
-	//  Reaction Animation (Common)
+	//  Reaction Animation
 	// =========================================================
 
 	/**
@@ -349,6 +346,13 @@ struct FAIUnitAssets : public FUnitBaseAssets
 	// =========================================================
 	//  GAS 어빌리티 (Abilities)
 	// =========================================================
+
+	/**
+	 * @brief 평타 어빌리티 (Basic Attack)
+	 * @details 쿨타임이 없거나 매우 짧은 기본 공격입니다. AI의 경우 스킬 쿨타임일 때 사용하는 '패시브성' 공격입니다.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GAS|Common")
+	TSubclassOf<UGameplayAbility> BasicAbility;
 
 	/**
 	 * @brief 스폰 시 부여할 기본 어빌리티 목록
