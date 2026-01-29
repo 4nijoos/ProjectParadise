@@ -16,15 +16,25 @@ class PARADISE_API ACharacterBase : public ACharacter
 public:
 	ACharacterBase();
 
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	/*
+	 * @brief 죽은후 Destroy() 하는 함수
+	 * @details 적은 일단 Destory() 변경예정 , 혹은 상위 클래스에서 오버라이드
+	 */
+	virtual void Die();
+
 protected:
 	virtual void BeginPlay() override;
 
-	virtual float TakeDamage(
-		float DamageAmount,
-		FDamageEvent const& DamageEvent,
-		AController* EventInstigator,
-		AActor* DamageCauser) override;
-
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	/*
+	 * @brief 외부에서 생성된 무기 액터를 이 캐릭터의 손(Socket)에 부착하는 함수
+	 * @param NewWeapon 부착할 무기 액터
+	 * @param SocketName 부착할 소켓 이름
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	void AttachWeapon(AActor* NewWeapon, FName SocketName);
 
 	/*
 	 * @brief Hit 이펙트를 적용 시키는 함수 (마테리얼 변화)
@@ -47,11 +57,13 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void SpawnDamagePopup(float DamageAmount);
 
-public:	
 
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	virtual void Die(){}
+public:
+	/* @brief 피아식별 ID (0: 플레이어, 1: 적, 2: 중립 등)
+	 * @details GAS 타겟팅이나 투사체 충돌 처리 시 사용
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Status")
+	uint8 TeamID = 0;
 
 protected:
 	/*
@@ -67,9 +79,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DamagePopupActor")
 	TSubclassOf<class AActor> DamageTextActorClass = nullptr;
 
+	/*
+	 * @brief 실제 무기 액터 인스턴스
+	 */
+	UPROPERTY(BlueprintReadOnly, Category = "Combat")
+	TObjectPtr<AActor> CurrentWeaponActor = nullptr;
 
 private:
-
+		
 	/*
 	 * @brief 피격 이펙트 타이머 핸들
 	*/
@@ -79,7 +96,7 @@ private:
 	/*
 	 * @brief 피격 이펙트 리셋 시간 ex) 3초후 리셋
 	*/
-	float HitResetTime = 3.0f;
+	float HitResetTime = 0.3f;
 
 
 };

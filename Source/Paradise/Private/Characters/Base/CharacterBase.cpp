@@ -26,15 +26,22 @@ void ACharacterBase::BeginPlay()
 	
 }
 
-float ACharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+void ACharacterBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	if (DamageAmount <= 0) return 0.0f;
+	if (CurrentWeaponActor)
+	{
+		CurrentWeaponActor->Destroy();
+		CurrentWeaponActor = nullptr;
+	}
 
-	PlayHitFlash();
+	Super::EndPlay(EndPlayReason);
+}
 
-	SpawnDamagePopup(DamageAmount);
 
-	return DamageAmount;
+void ACharacterBase::AttachWeapon(AActor* NewWeapon, FName SocketName)
+{
+	//무기 실제 메쉬 부착 진행
+	//Attach
 }
 
 void ACharacterBase::PlayHitFlash()
@@ -102,4 +109,7 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 }
 
-
+void ACharacterBase::Die()
+{
+	Destroy();
+}
