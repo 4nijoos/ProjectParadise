@@ -43,7 +43,7 @@ public:
 	APlayerData* GetSquadMemberData(int32 Index) const;
 
 	/*
-	 * @brief 현재 스쿼드 멤버 수 반환
+	 * @brief 현재 스                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            쿼드 멤버 수 반환
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Squad")
 	int32 GetSquadSize() const { return SquadMembers.Num(); }
@@ -57,8 +57,6 @@ protected:
 	TArray<TObjectPtr<APlayerData>> SquadMembers;
 
 	//  GAS 컴포넌트 (Commander Resources)
-protected:
-
 	/* 지휘관용 ASC (코스트/쿨타임/패시브 효과 관리용) */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
