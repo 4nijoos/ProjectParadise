@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "PC_InGameController.generated.h"
+#include "InGameController.generated.h"
 
 
 class APlayerBase;
@@ -18,7 +18,7 @@ struct FInputActionValue;
  * @details 영웅 교체(Switching), 스쿼드 명령, UI 인터랙션을 담당합니다.
  */
 UCLASS()
-class PARADISE_API APC_InGameController : public APlayerController
+class PARADISE_API AInGameController : public APlayerController
 {
 	GENERATED_BODY()
 

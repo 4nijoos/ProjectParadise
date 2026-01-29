@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "CMP_Equipment.generated.h"
+#include "EquipmentComponent.generated.h"
 
 class UDataTable;
 class APlayerBase;
-class UCMP_Inventory;
+class UInventoryComponent;
 UENUM(BlueprintType)
 enum class EEquipmentSlot : uint8 {
 	None
@@ -30,13 +30,13 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEquipmentUpdated);
  * - **[참고]** 현재 코드에서 사용되는 `EEquipmentSlot` Enum 타입은 아직 정식 구현 전 단계이며, 임시로 정의된 상태입니다.
  */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class PARADISE_API UCMP_Equipment : public UActorComponent
+class PARADISE_API UEquipmentComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UCMP_Equipment();
+	UEquipmentComponent();
 
 	/**
 	 * @brief 아이템 ID만으로 장비를 장착하는 스마트 함수
@@ -88,7 +88,7 @@ public:
 	/* * @brief 소유 확인을 위해 인벤토리 컴포넌트 참조 설정
 	 * @details PlayerData 생성 시점에 주입해줍니다.
 	 */
-	void SetLinkedInventory(UCMP_Inventory* InInventory);
+	void SetLinkedInventory(UInventoryComponent* InInventory);
 
 protected:
 	// Called when the game starts
@@ -137,7 +137,7 @@ protected:
 	TMap<EEquipmentSlot, FName> EquippedItems;
 
 	UPROPERTY()
-	TObjectPtr<UCMP_Inventory> LinkedInventory; // 소유권 확인용
+	TObjectPtr<UInventoryComponent> LinkedInventory; // 소유권 확인용
 
 private:
 

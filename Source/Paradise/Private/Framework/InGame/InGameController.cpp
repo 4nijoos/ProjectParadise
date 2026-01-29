@@ -1,15 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Framework/InGame/PC_InGameController.h"
-#include "Framework/InGame/PS_InGamePlayerState.h"
+#include "Framework/InGame/InGameController.h"
+#include "Framework/InGame/InGamePlayerState.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "InputMappingContext.h"
 #include "Characters/Base/PlayerBase.h"
 #include "AIController.h"
 #include "Kismet/GameplayStatics.h"
-void APC_InGameController::BeginPlay()
+void AInGameController::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -24,7 +24,7 @@ void APC_InGameController::BeginPlay()
 
     //[더미 테스트] 스쿼드 초기화 요청
     // 실제로는 GameMode나 로비에서 넘겨받은 데이터로 호출해야 함
-    APS_InGamePlayerState* PS = GetPlayerState<APS_InGamePlayerState>();
+    AInGamePlayerState* PS = GetPlayerState<AInGamePlayerState>();
     if (PS)
     {
         TArray<UHeroDataAsset*> EmptyAssets; // 더미용 빈 배열
@@ -36,7 +36,7 @@ void APC_InGameController::BeginPlay()
 
 }
 
-void APC_InGameController::SetupInputComponent()
+void AInGameController::SetupInputComponent()
 {
     Super::SetupInputComponent();
 
@@ -45,20 +45,20 @@ void APC_InGameController::SetupInputComponent()
     {
         // 1번 키 -> 인덱스 0
         if (IA_SwitchHero1)
-            EnhancedInputComponent->BindAction(IA_SwitchHero1, ETriggerEvent::Triggered, this, &APC_InGameController::OnInputSwitchHero1);
+            EnhancedInputComponent->BindAction(IA_SwitchHero1, ETriggerEvent::Triggered, this, &AInGameController::OnInputSwitchHero1);
 
         // 2번 키 -> 인덱스 1
         if (IA_SwitchHero2)
-            EnhancedInputComponent->BindAction(IA_SwitchHero2, ETriggerEvent::Triggered, this, &APC_InGameController::OnInputSwitchHero2);
+            EnhancedInputComponent->BindAction(IA_SwitchHero2, ETriggerEvent::Triggered, this, &AInGameController::OnInputSwitchHero2);
 
         // 3번 키 -> 인덱스 2
         if (IA_SwitchHero3)
-            EnhancedInputComponent->BindAction(IA_SwitchHero3, ETriggerEvent::Triggered, this, &APC_InGameController::OnInputSwitchHero3);
+            EnhancedInputComponent->BindAction(IA_SwitchHero3, ETriggerEvent::Triggered, this, &AInGameController::OnInputSwitchHero3);
     }
 
 }
 
-void APC_InGameController::RequestSwitchPlayer(int32 PlayerIndex)
+void AInGameController::RequestSwitchPlayer(int32 PlayerIndex)
 {
     if (!ActiveSquadPawns.IsValidIndex(PlayerIndex))
     {
@@ -80,9 +80,9 @@ void APC_InGameController::RequestSwitchPlayer(int32 PlayerIndex)
 	
 }
 
-void APC_InGameController::InitializeSquadPawns()
+void AInGameController::InitializeSquadPawns()
 {
-    APS_InGamePlayerState* PS = GetPlayerState<APS_InGamePlayerState>();
+    AInGamePlayerState* PS = GetPlayerState<AInGamePlayerState>();
     if (!PS) return;
 
     UE_LOG(LogTemp, Warning, TEXT("🎮 [Controller] 육체(Pawn) 소환 시작..."));
@@ -124,23 +124,23 @@ void APC_InGameController::InitializeSquadPawns()
     RequestSwitchPlayer(0);
 }
 
-void APC_InGameController::PossessAI(APlayerBase* TargetCharacter)
+void AInGameController::PossessAI(APlayerBase* TargetCharacter)
 {
 }
 
-void APC_InGameController::OnInputSwitchHero1(const FInputActionValue& Value)
+void AInGameController::OnInputSwitchHero1(const FInputActionValue& Value)
 {
     //입력 액션 바인딩 함수 후에 UI 모바일 버튼으로 바인딩예정
     RequestSwitchPlayer(0);
 }
 
-void APC_InGameController::OnInputSwitchHero2(const FInputActionValue& Value)
+void AInGameController::OnInputSwitchHero2(const FInputActionValue& Value)
 {
     //입력 액션 바인딩 함수 후에 UI 모바일 버튼으로 바인딩예정
     RequestSwitchPlayer(1);
 }
 
-void APC_InGameController::OnInputSwitchHero3(const FInputActionValue& Value)
+void AInGameController::OnInputSwitchHero3(const FInputActionValue& Value)
 {
     //입력 액션 바인딩 함수 후에 UI 모바일 버튼으로 바인딩예정
     RequestSwitchPlayer(2);

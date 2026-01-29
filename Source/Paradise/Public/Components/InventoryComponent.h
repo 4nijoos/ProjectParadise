@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "CMP_Inventory.generated.h"
+#include "InventoryComponent.generated.h"
 
 
 /**
@@ -81,12 +81,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryUpdated);
  * - 획득(Add) 및 소모(Remove) 시 데이터 테이블을 통해 ID 유효성을 검증합니다.
  */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class PARADISE_API UCMP_Inventory : public UActorComponent
+class PARADISE_API UInventoryComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
-	UCMP_Inventory();
+	UInventoryComponent();
 
 	/**
 	 * @brief 계정 데이터로부터 인벤토리를 초기화하는 함수 (구조체 현재 미구현 타입변경예정)

@@ -4,7 +4,7 @@
 #include "Characters/Player/PlayerData.h"
 #include "Characters/Base/CharacterBase.h"
 #include "AbilitySystemComponent.h"
-#include "Components/CMP_Equipment.h"
+#include "Components/EquipmentComponent.h"
 
 APlayerData::APlayerData()
 {
@@ -18,7 +18,7 @@ APlayerData::APlayerData()
 	AttributeSet = CreateDefaultSubobject<UAttributeSet>(TEXT("AttributeSet"));
 
 
-	EquipmentComponent = CreateDefaultSubobject<UCMP_Equipment>(TEXT("EquipmentComponent"));
+	EquipmentComponent = CreateDefaultSubobject<UEquipmentComponent>(TEXT("EquipmentComponent"));
 }
 
 void APlayerData::InitFromDataAsset(UPrimaryDataAsset* InData)
