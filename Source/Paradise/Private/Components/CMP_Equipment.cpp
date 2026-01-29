@@ -2,6 +2,7 @@
 
 
 #include "Components/CMP_Equipment.h"
+#include "Components/CMP_Inventory.h"
 
 // Sets default values for this component's properties
 UCMP_Equipment::UCMP_Equipment()
@@ -13,6 +14,11 @@ UCMP_Equipment::UCMP_Equipment()
 	// ...
 }
 
+
+void UCMP_Equipment::SetLinkedInventory(UCMP_Inventory* InInventory)
+{
+
+}
 
 // Called when the game starts
 void UCMP_Equipment::BeginPlay()

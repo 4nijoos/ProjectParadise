@@ -94,6 +94,7 @@ void APlayerBase::InitializePlayer(APlayerData* InPlayerData)
         //EquipComp->UpdateVisualsForPawn(this);
     }
 
+    UE_LOG(LogTemp, Log, TEXT("💪 [PlayerBase] 육체 초기화 완료!"));
   
 	
 }

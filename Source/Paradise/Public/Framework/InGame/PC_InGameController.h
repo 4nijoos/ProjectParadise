@@ -90,4 +90,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> IA_SwitchHero3 = nullptr;
+
+	/* * @brief 테스트용 캐릭터 클래스 (BP_PlayerBase 할당용)
+	 * @details 여기에 에디터에서 만든 캐릭터 블루프린트를 넣어주세요.
+	 */
+	UPROPERTY(EditDefaultsOnly, Category = "Squad|Test")
+	TSubclassOf<APlayerBase> TestPlayerClass; // [추가됨]
 };

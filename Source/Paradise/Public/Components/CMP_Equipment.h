@@ -8,6 +8,7 @@
 
 class UDataTable;
 class APlayerBase;
+class UCMP_Inventory;
 UENUM(BlueprintType)
 enum class EEquipmentSlot : uint8 {
 	None
@@ -84,6 +85,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Equipment|Visual")
 	void UpdateVisuals(APlayerBase* TargetCharacter);
 
+	/* * @brief 소유 확인을 위해 인벤토리 컴포넌트 참조 설정
+	 * @details PlayerData 생성 시점에 주입해줍니다.
+	 */
+	void SetLinkedInventory(UCMP_Inventory* InInventory);
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -129,6 +135,9 @@ protected:
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment|State")
 	TMap<EEquipmentSlot, FName> EquippedItems;
+
+	UPROPERTY()
+	TObjectPtr<UCMP_Inventory> LinkedInventory; // 소유권 확인용
 
 private:
 

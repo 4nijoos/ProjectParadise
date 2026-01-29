@@ -23,6 +23,11 @@ APlayerData::APlayerData()
 
 void APlayerData::InitFromDataAsset(UPrimaryDataAsset* InData)
 {
+	this->RespawnTimer = 3.0f; // 3초 부활
+
+	// 로그 출력
+	FString DummyName = FString::Printf(TEXT("Hero_%d"), FMath::RandRange(100, 999)); // 임시 이름
+	UE_LOG(LogTemp, Warning, TEXT("👻 [PlayerData : %s] 영혼 생성 완료! (이름: %s)"),*this->GetName(), *DummyName);
 }
 
 void APlayerData::OnDeath()
