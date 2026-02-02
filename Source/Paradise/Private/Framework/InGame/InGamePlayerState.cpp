@@ -40,7 +40,7 @@ void AInGamePlayerState::InitSquad(const TArray<FName>& StartingHeroIDs)
     //전달 받은 멤버 숫자가 아무도없으면 로그
     if (SquadMembers.Num() == 0)
     {
-        UE_LOG(LogTemp, Warning, TEXT("⚠️ 전달된 ID가 없습니다. 테스트용 더미 데이터를 생성합니다."));
+        UE_LOG(LogTemp, Warning, TEXT("⚠️ 전달된 유효한 ID가 없어 스쿼드가 비어 있습니다. 더미 데이터를 생성하지 않습니다."));
     }
 
     UE_LOG(LogTemp, Warning, TEXT("✅ [PlayerState] 스쿼드 생성 완료! (멤버 수: %d)"), SquadMembers.Num());
