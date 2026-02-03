@@ -121,7 +121,7 @@ public:
 	 * 근거리 무기의 경우 충돌(Trace) 검사 길이로 사용됩니다.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat Stats", meta = (ClampMin = "0.0"))
-	float Range;
+	float AttackRange;
 
 	/**
 	 * @brief 스킬 재사용 대기시간 (Cooldown)
