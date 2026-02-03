@@ -124,7 +124,7 @@ public:
 	float Range;
 
 	/**
-	 * @brief 스킬/공격 재사용 대기시간 (Cooldown)
+	 * @brief 스킬 재사용 대기시간 (Cooldown)
 	 * @details 단위: 초 (Seconds).
 	 * GAS의 Cooldown GameplayEffect(GE_Cooldown)에 적용될 지속 시간(Duration)입니다.
 	 */
