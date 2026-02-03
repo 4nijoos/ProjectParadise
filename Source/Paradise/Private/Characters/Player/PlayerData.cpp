@@ -32,7 +32,7 @@ void APlayerData::InitFromDataTable(const FDataTableRowHandle& InDataHandle)
     //유효성 검사
     if (CharacterDataHandle.IsNull())
     {
-        UE_LOG(LogTemp, Error, TEXT("❌ [PlayerData] 데이터 핸들이 비어있습니다!"));
+        UE_LOG(LogTemp, Error, TEXT("❌ [PlayerData] CharacterDataHandle : 데이터 핸들이 비어있습니다!"));
         return;
     }
 
@@ -56,6 +56,30 @@ void APlayerData::InitFromDataTable(const FDataTableRowHandle& InDataHandle)
     {
         UE_LOG(LogTemp, Error, TEXT("❌ [PlayerData] %s 행을 찾을 수 없거나 타입이 일치하지 않습니다."), *CharacterDataHandle.RowName.ToString());
     }
+}
+
+void APlayerData::InitAssetsFromDataTable(const FDataTableRowHandle& InAssetHandle)
+{
+    CharacterAssetHandle = InAssetHandle;
+
+    if (CharacterAssetHandle.IsNull())
+    {
+        UE_LOG(LogTemp, Error, TEXT("❌ [PlayerData] CharacterAssetHandle : 데이터 핸들이 비어있습니다!"));
+        return;
+    }
+
+    //테이블에서 Row 가져오기
+    //GetRow<구조체타입>(ContextString)
+    static const FString ContextString(TEXT("PlayerData::InitAssetsFromDataTable"));
+    FCharacterAssets* Assets = CharacterAssetHandle.GetRow<FCharacterAssets>(ContextString);
+
+    if (Assets)
+    {
+        this->CachedMesh = Assets->SkeletalMesh.LoadSynchronous();
+        this->CachedAnimBP = Assets->AnimBlueprint;
+    }
+
+
 }
 
 void APlayerData::OnDeath()
