@@ -15,6 +15,8 @@ void USummonControlPanel::NativeConstruct()
 	if (SummonSlot_0) SummonSlots.Add(SummonSlot_0);
 	if (SummonSlot_1) SummonSlots.Add(SummonSlot_1);
 	if (SummonSlot_2) SummonSlots.Add(SummonSlot_2);
+	if (SummonSlot_3) SummonSlots.Add(SummonSlot_3);
+	if (SummonSlot_4) SummonSlots.Add(SummonSlot_4); 
 }
 #pragma endregion 생명주기
 
