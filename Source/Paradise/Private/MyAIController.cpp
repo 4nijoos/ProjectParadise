@@ -7,15 +7,35 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "BaseUnit.h"
+#include "HomeBase.h"
 #include "Kismet/GameplayStatics.h"
 
 AMyAIController::AMyAIController()
 {
-    SightConfig->SightRadius = 800.f;
-    SightConfig->LoseSightRadius = 1000.f;
+    AIPerception = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception"));
+    SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
 
-    AIPerception->ConfigureSense(*SightConfig);
-    AIPerception->OnTargetPerceptionUpdated.AddDynamic(this, &AMyAIController::OnTargetDetected);
+    if (SightConfig)
+    {
+        SightConfig->SightRadius = 800.f;
+        SightConfig->LoseSightRadius = 1000.f;
+        SightConfig->PeripheralVisionAngleDegrees = 90.f;
+
+        SightConfig->DetectionByAffiliation.bDetectEnemies = true;
+        SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
+        SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
+
+        if (AIPerception)
+        {
+            AIPerception->ConfigureSense(*SightConfig);
+            AIPerception->SetDominantSense(SightConfig->GetSenseImplementation());
+        }
+    }
+
+    if (AIPerception)
+    {
+        AIPerception->OnTargetPerceptionUpdated.AddDynamic(this, &AMyAIController::OnTargetDetected);
+    }
 }
 
 void AMyAIController::OnPossess(APawn* InPawn)
@@ -25,21 +45,22 @@ void AMyAIController::OnPossess(APawn* InPawn)
     if (BTAsset && BBAsset)
     {
         UBlackboardComponent* BBRawPtr = Blackboard.Get();
-
         if (UseBlackboard(BBAsset, BBRawPtr))
         {
-            // 1. 적군 기지 찾기 로직
-            TArray<AActor*> OutActors;
-            UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseUnit::StaticClass(), OutActors);
-
             ABaseUnit* SelfUnit = Cast<ABaseUnit>(InPawn);
-            for (AActor* Actor : OutActors)
+
+            TArray<AActor*> FoundBases;
+            UGameplayStatics::GetAllActorsOfClass(GetWorld(), AHomeBase::StaticClass(), FoundBases);
+
+            UE_LOG(LogTemp, Warning, TEXT("[%s] Found %d Bases in World"), *InPawn->GetName(), FoundBases.Num());
+
+            for (AActor* Actor : FoundBases)
             {
-                ABaseUnit* Unit = Cast<ABaseUnit>(Actor);
-                // 팀이 다르고 "Base" 태그가 있는 액터 찾기
-                if (Unit && SelfUnit && Unit->TeamID != SelfUnit->TeamID && Actor->ActorHasTag(TEXT("Base")))
+                AHomeBase* HomeBase = Cast<AHomeBase>(Actor);
+                if (HomeBase && SelfUnit && HomeBase->TeamID != SelfUnit->TeamID && Actor->ActorHasTag(TEXT("Base")))
                 {
-                    Blackboard->SetValueAsObject(TEXT("BaseActor"), Actor);
+                    Blackboard->SetValueAsObject(TEXT("HomeBaseActor"), Actor);
+                    UE_LOG(LogTemp, Warning, TEXT("[%s] Target Base Set: %s"), *InPawn->GetName(), *Actor->GetName());
                     break;
                 }
             }
@@ -55,10 +76,8 @@ void AMyAIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
 
     AActor* CurrentTarget = Cast<AActor>(Blackboard->GetValueAsObject(BB_KEYS::TargetActor));
 
-    // 이미 타겟이 있는 경우
     if (CurrentTarget && CurrentTarget->IsValidLowLevel())
     {
-        // 현재 타겟을 놓친 경우에만 초기화
         if (CurrentTarget == Actor && !Stimulus.WasSuccessfullySensed())
         {
             Blackboard->ClearValue(BB_KEYS::TargetActor);
@@ -66,13 +85,11 @@ void AMyAIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
         return;
     }
 
-    // 타겟이 없는 상태에서 새로 감지했을 때
     if (Stimulus.WasSuccessfullySensed())
     {
         ABaseUnit* TargetUnit = Cast<ABaseUnit>(Actor);
         ABaseUnit* SelfUnit = Cast<ABaseUnit>(GetPawn());
 
-        // 적군일 때만 타겟으로 등록
         if (TargetUnit && SelfUnit && TargetUnit->TeamID != SelfUnit->TeamID)
         {
             Blackboard->SetValueAsObject(BB_KEYS::TargetActor, Actor);
