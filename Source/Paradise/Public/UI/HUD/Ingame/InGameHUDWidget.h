@@ -12,6 +12,7 @@ class UCharacterStatusWidget;
 class UPartyStatusPanel;
 class USummonControlPanel;
 class UParadiseCommonButton;
+class UVirtualJoystickWidget;
 #pragma endregion 전방 선언
 
 /**
@@ -57,6 +58,10 @@ private:
 	/** @brief 자동/수동 전투 모드 전환 버튼 클릭 처리 */
 	UFUNCTION()
 	void OnAutoModeButtonClicked();
+
+	/** @brief 가상 조이스틱 입력 처리 (캐릭터 이동) */
+	UFUNCTION()
+	void OnJoystickInput(FVector2D InputVector);
 #pragma endregion 내부 로직
 
 #pragma region 위젯 바인딩
@@ -64,6 +69,10 @@ private:
 	/** @brief 좌측 상단 파티 목록 패널 */
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UPartyStatusPanel> PartyStatusPanel = nullptr;
+
+	/** @brief 좌측 하단 가상 조이스틱 (이동) */
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UVirtualJoystickWidget> VirtualJoystick = nullptr;
 
 	/** @brief 우측 하단 스킬/공격 조작 패널 */
 	UPROPERTY(meta = (BindWidget))
