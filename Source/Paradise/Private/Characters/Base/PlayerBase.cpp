@@ -5,9 +5,10 @@
 #include "Characters/Player/PlayerData.h"
 #include "Components/EquipmentComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
-#include "GameFramework/SpringArmComponent.h"
+#include "Framework/InGame/InGameController.h"
 #include "InputActionValue.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -106,8 +107,8 @@ void APlayerBase::InitializePlayer(APlayerData* InPlayerData)
     if (UEquipmentComponent* EquipComp = InPlayerData->EquipmentComponent2)
     {
         //장비컴포넌트에 장착된 장비 비쥬얼적으로 보이게 하는 함수 구현해야함
-        EquipComp->UpdateVisuals(this);
-        UE_LOG(LogTemp, Log, TEXT("💪 [PlayerBase] UpdateVisuals 완료!"));
+        //EquipComp->UpdateVisuals(this);
+        //UE_LOG(LogTemp, Log, TEXT("💪 [PlayerBase] UpdateVisuals 완료!"));
     }
 
     UE_LOG(LogTemp, Log, TEXT("💪 [PlayerBase] 육체 초기화 완료!"));
@@ -191,12 +192,24 @@ void APlayerBase::SwitchCameraMode()
 
 void APlayerBase::Die()
 {
+    //이미 죽었으면 중복 실행 방지
+    if (bIsDead) return;
+
+    UE_LOG(LogTemp, Warning, TEXT("[PlayerBase] 육체가 사망했습니다."));
+
+    //부모의 Die 호출 -> 래그돌(Ragdoll) 실행
+    Super::Die();
+
+    //영혼(PlayerData)에게 사망 사실 통보 -> 부활 타이머 가동
     if (LinkedPlayerData.IsValid())
     {
         LinkedPlayerData->OnDeath();
     }
 
-    Super::Die();
+    if (AInGameController* PC = GetWorld()->GetFirstPlayerController<AInGameController>())
+    {
+        PC->OnPlayerDied(this);
+    }
 
 }
 

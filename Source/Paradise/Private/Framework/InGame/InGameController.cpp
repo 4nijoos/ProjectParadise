@@ -6,8 +6,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "InputMappingContext.h"
-#include "Characters/Base/PlayerBase.h"
 #include "AIController.h"
+#include "Characters/Base/PlayerBase.h"
 #include "Kismet/GameplayStatics.h"
 void AInGameController::BeginPlay()
 {
@@ -69,18 +69,81 @@ void AInGameController::RequestSwitchPlayer(int32 PlayerIndex)
         return;
     }
 
-    APlayerBase* TargetPawn = ActiveSquadPawns[PlayerIndex];
-    if (!TargetPawn || TargetPawn == GetPawn()) return; // 이미 조종 중이면 패스
+    APlayerBase* NewPlayer = ActiveSquadPawns[PlayerIndex];
+    APlayerBase* OldPlayer = Cast<APlayerBase>(GetPawn());
 
-    // [빙의 실행]
-    Possess(TargetPawn);
+    // 이미 조종 중이거나 대상이 없으면 리턴
+    if (!NewPlayer || NewPlayer == OldPlayer) return;
+    //죽어있는 플레이어 Base는 리턴
+    if (NewPlayer && NewPlayer->IsDead()) return;
+
+
+    //요청된 캐릭터에 AI가 붙어있었다면 제거
+    if (AController* NewPawnController = NewPlayer->GetController())
+    {
+        // AI 컨트롤러라면 제거 (PlayerController가 빙의하면 자동으로 UnPossess되지만, 액터는 남으므로 파괴 필요)
+        if (NewPawnController != this)
+        {
+            NewPawnController->UnPossess();
+            NewPawnController->Destroy();
+        }
+    }
+
+    //요청된 캐릭터로 빙의
+    Possess(NewPlayer);
     CurrentControlledIndex = PlayerIndex;
 
-    // 화면 메시지 출력
+    //이전캐릭터에 AI 주입
+    if (OldPlayer)
+    {
+        PossessAI(OldPlayer);
+    }
+
+    // 로그
     FString Msg = FString::Printf(TEXT("Switch -> Hero %d"), PlayerIndex + 1);
     GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Cyan, Msg);
-    UE_LOG(LogTemp, Warning, TEXT("🔄 [Controller] 캐릭터 교체 완료: %d번"), PlayerIndex);
+
+    UE_LOG(LogTemp, Warning, TEXT("🔄 [Controller] 캐릭터 교체 완료 (%s -> %s)"),
+        OldPlayer ? *OldPlayer->GetName() : TEXT("None"), // <-- 수정됨
+        *NewPlayer->GetName());
 	
+}
+
+void AInGameController::OnPlayerDied(APlayerBase* DeadPlayer)
+{
+    //방금 죽은 게 내가 조종하던 캐릭터인지 확인
+    if (DeadPlayer == GetPawn())
+    {
+        UE_LOG(LogTemp, Warning, TEXT("🚨 [Controller] 플레이어 사망! 다음 생존자를 찾습니다..."));
+
+        int32 NextAliveIndex = -1;
+        int32 SquadSize = ActiveSquadPawns.Num();
+
+        //현재 인덱스 다음부터 한 바퀴 돌면서 생존 플레이어 탐색
+        for (int32 i = 1; i < SquadSize; i++)
+        {
+            int32 CheckIndex = (CurrentControlledIndex + i) % SquadSize;
+            APlayerBase* Candidate = ActiveSquadPawns[CheckIndex];
+
+            // 살아있는 동료 발견!
+            if (Candidate && !Candidate->IsDead())
+            {
+                NextAliveIndex = CheckIndex;
+                break;
+            }
+        }
+
+        //생존자가 있으면 교체, 없으면 게임 오버
+        if (NextAliveIndex != -1)
+        {
+            RequestSwitchPlayer(NextAliveIndex);
+        }
+    }
+    else
+    {
+        // (AI 동료가 죽은 경우) - 로그만 찍거나 별도 처리
+        UE_LOG(LogTemp, Warning, TEXT("🤖 [Controller] 동료(AI)가 사망했습니다."));
+    }
 }
 
 void AInGameController::InitializeSquadPawns()
@@ -124,11 +187,51 @@ void AInGameController::InitializeSquadPawns()
         }
     }
 
+    for (APlayerBase* Member : ActiveSquadPawns)
+    {
+        if (Member)
+        {
+            //일단 전부 AI컨트롤러 Possess
+            PossessAI(Member);
+        }
+    }
+
+    //첫번째 캐릭터에 변경요청
     RequestSwitchPlayer(0);
 }
 
 void AInGameController::PossessAI(APlayerBase* TargetCharacter)
 {
+    if (!TargetCharacter || !SquadAIControllerClass) return;
+
+    //기존 컨트롤러 정리
+    if (AController* OldCon = TargetCharacter->GetController())
+    {
+        //만약 (PlayerController)라면 건드리지 않음
+        if (OldCon == this) return;
+
+        OldCon->UnPossess();
+        OldCon->Destroy(); // 기존 AI 삭제
+    }
+
+    //AI 컨트롤러 스폰
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+    //많은 양의 스폰액터가 아니기때문에 오브젝트 풀링 미적용예정
+    AAIController* NewAI = GetWorld()->SpawnActor<AAIController>(
+        SquadAIControllerClass,
+        TargetCharacter->GetActorLocation(),
+        TargetCharacter->GetActorRotation(),
+        SpawnParams
+    );
+
+    if (NewAI)
+    {
+        //빙의 (OnPossess가 호출되면서 비헤이비어 트리가 실행됨)
+        NewAI->Possess(TargetCharacter);
+        UE_LOG(LogTemp, Log, TEXT("🤖 [AI] %s에게 AI 컨트롤러가 빙의했습니다."), *TargetCharacter->GetName());
+    }
 }
 
 void AInGameController::OnInputSwitchHero1(const FInputActionValue& Value)

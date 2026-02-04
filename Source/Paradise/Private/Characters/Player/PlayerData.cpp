@@ -107,6 +107,7 @@ void APlayerData::OnDeath()
 	bIsDead = true;
 
 	// 부활 타이머 시작 (예: 5초 뒤 부활)
+    UE_LOG(LogTemp, Error, TEXT("👻 [PlayerData] 영혼 사망 확인. 5초 뒤 리스폰 가능합니다"));
 	GetWorld()->GetTimerManager().SetTimer(
 		RespawnTimerHandle, 
 		this, 
@@ -115,6 +116,8 @@ void APlayerData::OnDeath()
 		false);
 
 	UE_LOG(LogTemp, Warning, TEXT("5초 뒤 부활 예정."));
+    // TODO: 여기서 GameMode나 PlayerController에게 "새 몸 줘!"라고 요청하는 코드 필요
+    // 예: GetWorld()->GetAuthGameMode<AMyGameMode>()->RespawnHero(this);
 }
 
 void APlayerData::OnRespawnFinished()

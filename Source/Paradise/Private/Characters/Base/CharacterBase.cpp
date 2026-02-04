@@ -4,6 +4,7 @@
 #include "Characters/Base/CharacterBase.h"
 #include "Framework/System/ObjectPoolSubsystem.h"
 #include "Components/WidgetComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "AttributeSet.h"
 
 ACharacterBase::ACharacterBase()
@@ -19,6 +20,18 @@ ACharacterBase::ACharacterBase()
 
 }
 
+
+void ACharacterBase::TestKillSelf()
+{
+	if (bIsDead)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("⚠️ [Debug] 이미 사망한 상태입니다."));
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("💀 [Debug] 강제 사망 명령 실행! (TestKillSelf)"));
+	Die();
+}
 
 void ACharacterBase::BeginPlay()
 {
@@ -129,5 +142,30 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void ACharacterBase::Die()
 {
-	Destroy();
+	if (bIsDead) return;
+	bIsDead = true;
+
+	UE_LOG(LogTemp, Error, TEXT("☠️ [CharacterBase] Die() 로직 시작 - 래그돌 전환"));
+
+	//물리적 처리 (서 있는 캡슐은 끄고, 메쉬는 흐물거리는 래그돌로)
+	if (GetCapsuleComponent())
+	{
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+
+	if (GetMesh())
+	{
+		// 래그돌 프리셋 적용 (PhysicsAsset이 설정되어 있어야 함)
+		GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+		GetMesh()->SetSimulatePhysics(true);
+	}
+
+	//조작 차단
+	if (Controller)
+	{
+		Controller->UnPossess(); // 영혼 이탈
+	}
+
+	//시체 청소 (5초 뒤에 액터 삭제)
+	SetLifeSpan(5.0f);
 }

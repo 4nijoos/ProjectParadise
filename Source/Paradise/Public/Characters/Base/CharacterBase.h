@@ -32,6 +32,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void AttachWeapon(AActor* NewWeapon, FName SocketName);
 
+	/** * @brief [디버그용] 강제로 Die() 함수를 호출하여 사망 처리 로직을 테스트합니다.
+	 * @details 콘솔 명령어(~) 창에서 "TestKillSelf"를 입력하여 실행할 수 있습니다.
+	 */
+	UFUNCTION(BlueprintCallable, Exec, Category = "Debug")
+	void TestKillSelf();
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -68,6 +74,11 @@ public:
 	uint8 TeamID = 0;
 
 protected:
+	/*
+	 * @brief 사망 여부 체크 플래그
+	*/
+	bool bIsDead = false;
+
 	/*
 	 * @brief 머리위 hp위젯컴포넌트
 	*/

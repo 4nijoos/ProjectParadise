@@ -36,6 +36,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Squad")
 	void RequestSwitchPlayer(int32 PlayerIndex);
 
+	/** @brief 캐릭터 사망 시 호출되어 다음 생존 캐릭터로 자동 교체합니다. */
+	void OnPlayerDied(APlayerBase* DeadPlayer);
+
 private:
 	/*
 	 * @brief 게임 시작 시 스쿼드 3명을 월드에 스폰하고 초기화하는 함수

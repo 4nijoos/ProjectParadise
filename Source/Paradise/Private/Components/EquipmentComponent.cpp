@@ -78,7 +78,11 @@ void UEquipmentComponent::AttachWeaponActor(APlayerBase* Char, FName ItemID)
     Params.Owner = Char;
     Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-    AStaticMeshActor* NewWeapon = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator, Params);
+    AStaticMeshActor* NewWeapon = GetWorld()->SpawnActor<AStaticMeshActor>(
+        AStaticMeshActor::StaticClass(), 
+        FVector::ZeroVector, 
+        FRotator::ZeroRotator, 
+        Params);
 
     if (NewWeapon)
     {
