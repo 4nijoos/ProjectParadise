@@ -1,55 +1,49 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "MyAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "MonsterAI.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
+#include "BaseUnit.h"
+#include "Kismet/GameplayStatics.h"
 
 AMyAIController::AMyAIController()
 {
-    // 1. 퍼셉션 컴포넌트 생성
-    AIPerception = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception"));
-    SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
+    SightConfig->SightRadius = 800.f;
+    SightConfig->LoseSightRadius = 1000.f;
 
-    // 2. 시야 설정
-    SightConfig->SightRadius = 2000.f;          // 감지 거리
-    SightConfig->LoseSightRadius = 2500.f;      // 놓치는 거리
-    SightConfig->PeripheralVisionAngleDegrees = 90.f; // 시야각
-    SightConfig->DetectionByAffiliation.bDetectEnemies = true;
-    SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
-    SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
-
-    // 3. 컴포넌트에 설정 적용
     AIPerception->ConfigureSense(*SightConfig);
-    AIPerception->SetDominantSense(SightConfig->GetSenseImplementation());
-
-    // 4. 감지 이벤트 연결
     AIPerception->OnTargetPerceptionUpdated.AddDynamic(this, &AMyAIController::OnTargetDetected);
 }
 
-/**
- * @brief 몬스터(Pawn)가 스폰되어 컨트롤러가 빙의(Possess)될 때 실행됩니다.
- */
 void AMyAIController::OnPossess(APawn* InPawn)
 {
     Super::OnPossess(InPawn);
 
     if (BTAsset && BBAsset)
     {
-        UBlackboardComponent* BBComp = Blackboard;
+        UBlackboardComponent* BBRawPtr = Blackboard.Get();
 
-        if (UseBlackboard(BBAsset, BBComp))
+        if (UseBlackboard(BBAsset, BBRawPtr))
         {
-            // 1. 초기 목적지 설정 (예: X=2000 지점의 적진)
-            Blackboard->SetValueAsVector(BB_KEYS::TargetLocation, FVector(2000.f, 0.f, 0.f));
+            // 1. 적군 기지 찾기 로직
+            TArray<AActor*> OutActors;
+            UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseUnit::StaticClass(), OutActors);
 
-            // 2. 초기 상태를 Idle(대기)로 설정
-            Blackboard->SetValueAsEnum(BB_KEYS::AIState, static_cast<uint8>(EMonsterState::Idle));
+            ABaseUnit* SelfUnit = Cast<ABaseUnit>(InPawn);
+            for (AActor* Actor : OutActors)
+            {
+                ABaseUnit* Unit = Cast<ABaseUnit>(Actor);
+                // 팀이 다르고 "Base" 태그가 있는 액터 찾기
+                if (Unit && SelfUnit && Unit->TeamID != SelfUnit->TeamID && Actor->ActorHasTag(TEXT("Base")))
+                {
+                    Blackboard->SetValueAsObject(TEXT("BaseActor"), Actor);
+                    break;
+                }
+            }
 
-            // 3. 결정된 데이터를 바탕으로 비헤이비어 트리 가동
             RunBehaviorTree(BTAsset);
         }
     }
@@ -59,12 +53,29 @@ void AMyAIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
 {
     if (Blackboard == nullptr) return;
 
+    AActor* CurrentTarget = Cast<AActor>(Blackboard->GetValueAsObject(BB_KEYS::TargetActor));
+
+    // 이미 타겟이 있는 경우
+    if (CurrentTarget && CurrentTarget->IsValidLowLevel())
+    {
+        // 현재 타겟을 놓친 경우에만 초기화
+        if (CurrentTarget == Actor && !Stimulus.WasSuccessfullySensed())
+        {
+            Blackboard->ClearValue(BB_KEYS::TargetActor);
+        }
+        return;
+    }
+
+    // 타겟이 없는 상태에서 새로 감지했을 때
     if (Stimulus.WasSuccessfullySensed())
     {
-        Blackboard->SetValueAsObject(BB_KEYS::TargetActor, Actor);
-    }
-    else
-    {
-        Blackboard->ClearValue(BB_KEYS::TargetActor);
+        ABaseUnit* TargetUnit = Cast<ABaseUnit>(Actor);
+        ABaseUnit* SelfUnit = Cast<ABaseUnit>(GetPawn());
+
+        // 적군일 때만 타겟으로 등록
+        if (TargetUnit && SelfUnit && TargetUnit->TeamID != SelfUnit->TeamID)
+        {
+            Blackboard->SetValueAsObject(BB_KEYS::TargetActor, Actor);
+        }
     }
 }
