@@ -3,144 +3,160 @@
 
 #include "UI/Widgets/Ingame/SkillSlotWidget.h"
 
+#include "CommonButtonBase.h"
 #include "Components/Image.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
-#include "TimerManager.h"
 #include "Engine/Texture2D.h"
+#include "TimerManager.h"
 
+USkillSlotWidget::USkillSlotWidget(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+}
+
+#pragma region 생명주기
 void USkillSlotWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-#pragma region 초기 UI 상태 설정
-	// 최적화: 초기화 시점에 UI 요소를 비활성 상태로 세팅
-	if (PB_Cooldown)
+	// 입력 처리는 버튼에게 위임하고, 위젯은 그 결과만 받아 처리합니다.
+	if (Btn_SkillAction)
 	{
-		PB_Cooldown->SetPercent(0.f);
+		Btn_SkillAction->OnClicked().AddUObject(this, &USkillSlotWidget::OnSkillButtonClicked);
 	}
 
-	if (Text_CooldownTime)
-	{
-		Text_CooldownTime->SetVisibility(ESlateVisibility::Collapsed);
-	}
-#pragma endregion 초기 UI 상태 설정
+	// 초기 상태 설정
+	ClearCooldownVisual();
 }
 
 void USkillSlotWidget::NativeDestruct()
 {
-#pragma region 리소스 정리
-	StopCooldownTimer();
-	Super::NativeDestruct();
-#pragma endregion 리소스 정리
-}
-
-void USkillSlotWidget::UpdateSkillSlotData(UTexture2D* NewIcon, float InMaxCooldown)
-{
-#pragma region 캐릭터 태그 및 데이터 초기화
-	/** * @brief 캐릭터 교체(Tag) 시 호출되어 슬롯의 데이터를 동적으로 주입받습니다.
-	 * @details 기존 타이머를 즉시 정지시켜 이전 캐릭터의 데이터가 현재 캐릭터 UI에 영향을 주지 않도록 합니다.
-	 */
-	StopCooldownTimer();
-
-	// 데이터 드라이븐: 데이터 테이블이나 외부에서 전달받은 스탯 주입
-	MaxCooldownTime = InMaxCooldown;
-	CurrentCooldownTime = 0.f;
-
-	// 캡슐화된 이미지 컴포넌트에 텍스처 설정
-	if (Image_Icon && NewIcon)
+	// 타이머 정리 (메모리 누수 방지)
+	if (GetWorld())
 	{
-		Image_Icon->SetBrushFromTexture(NewIcon);
+		GetWorld()->GetTimerManager().ClearTimer(CooldownTimerHandle);
 	}
 
-	// UI 초기 상태 리셋
-	if (PB_Cooldown) PB_Cooldown->SetPercent(0.f);
-	if (Text_CooldownTime) Text_CooldownTime->SetVisibility(ESlateVisibility::Collapsed);
-#pragma endregion 캐릭터 태그 및 데이터 초기화
+	Super::NativeDestruct();
+}
+#pragma endregion 생명주기
+
+#pragma region 외부 인터페이스 구현
+void USkillSlotWidget::UpdateSlotInfo(UTexture2D* InIconTexture, float InMaxCooldownTime)
+{
+	if (InIconTexture && Img_SkillIcon)
+	{
+		Img_SkillIcon->SetBrushFromTexture(InIconTexture);
+	}
+
+	MaxCooldown = InMaxCooldownTime;
+
+	// 데이터가 변경되면 쿨타임 표시도 초기화
+	ClearCooldownVisual();
 }
 
-void USkillSlotWidget::SetCooldownStatus(float CooldownTime, float MaxTime)
+void USkillSlotWidget::RefreshCooldown(float CurrentTime, float MaxTime)
 {
-#pragma region 타이머 로직 트리거
-	CurrentCooldownTime = CooldownTime;
-	MaxCooldownTime = MaxTime;
+	CurrentCooldown = CurrentTime;
+	MaxCooldown = MaxTime;
 
-	if (CurrentCooldownTime > 0.f)
+	if (CurrentCooldown > 0.0f)
 	{
-		// 최적화: 타이머가 이미 돌고 있다면 중복 생성하지 않음
-		if (!GetWorld()->GetTimerManager().IsTimerActive(CooldownTimerHandle))
+		// 쿨타임이 남아있다면 버튼을 비활성화하여 입력을 차단합니다
+		if (Btn_SkillAction)
 		{
-			// 데이터 드라이븐: 기획자가 설정한 UpdateInterval 주기를 참조하여 타이머 시작
-			GetWorld()->GetTimerManager().SetTimer(
-				CooldownTimerHandle,
-				this,
-				&USkillSlotWidget::UpdateCooldownVisual,
-				UpdateInterval,
-				true
-			);
+			Btn_SkillAction->SetIsEnabled(false);
+		}
+
+		if (PB_Cooldown)
+		{
+			PB_Cooldown->SetVisibility(ESlateVisibility::HitTestInvisible);
 		}
 
 		if (Text_CooldownTime)
 		{
-			Text_CooldownTime->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+			Text_CooldownTime->SetVisibility(ESlateVisibility::HitTestInvisible);
+		}
+
+		// 타이머가 돌고 있지 않다면 시작합니다.
+		if (GetWorld() && !GetWorld()->GetTimerManager().IsTimerActive(CooldownTimerHandle))
+		{
+			GetWorld()->GetTimerManager().SetTimer(
+				CooldownTimerHandle,
+				this,
+				&USkillSlotWidget::UpdateCooldownVisual, 
+				UpdateInterval, 
+				true);
 		}
 	}
 	else
 	{
-		StopCooldownTimer();
+		ClearCooldownVisual();
 	}
-#pragma endregion 타이머 로직 트리거
+}
+#pragma endregion 외부 인터페이스 구현
+
+#pragma region 내부 로직 구현
+void USkillSlotWidget::OnSkillButtonClicked()
+{
+	// 쿨타임 중이 아닐 때만 로직 수행 (이중 검증)
+	if (CurrentCooldown <= 0.0f)
+	{
+		// TODO: 실제 스킬 사용 요청을 상위 컨트롤러나 GAS Component로 전달하는 델리게이트 호출
+		// 예: OnSkillActionRequested.Broadcast(SkillId);
+	}
 }
 
 void USkillSlotWidget::UpdateCooldownVisual()
 {
-#pragma region 실시간 시각화 갱신
-	/**
-	 * @brief 타이머 주기에 맞춰 호출되어 ProgressBar와 Text를 갱신합니다.
-	 * @details 매 프레임 연산하는 Tick보다 훨씬 가벼우며, 정해진 주기(UpdateInterval)만큼만 계산합니다.
-	 */
-	CurrentCooldownTime -= UpdateInterval;
+	CurrentCooldown -= UpdateInterval;
 
-	// 쿨타임 종료 판정
-	if (CurrentCooldownTime <= 0.f)
+	if (CurrentCooldown <= 0.0f)
 	{
-		StopCooldownTimer();
+		ClearCooldownVisual();
 		return;
 	}
 
-	// 캡슐화된 위젯 컴포넌트 안전성 체크 후 갱신
-	if (PB_Cooldown && MaxCooldownTime > 0.f)
+	// 퍼센트 계산 (0.0 ~ 1.0)
+	const float Percent = FMath::Clamp(CurrentCooldown / MaxCooldown, 0.0f, 1.0f);
+
+	if (PB_Cooldown)
 	{
-		PB_Cooldown->SetPercent(CurrentCooldownTime / MaxCooldownTime);
+		PB_Cooldown->SetPercent(Percent);
 	}
 
 	if (Text_CooldownTime)
 	{
-		// 올림(Ceil) 처리를 통해 유저에게 남은 초를 직관적으로 표시
-		Text_CooldownTime->SetText(FText::AsNumber(FMath::CeilToInt(CurrentCooldownTime)));
+		// 소수점 올림 처리하여 정수로 표시
+		Text_CooldownTime->SetText(FText::AsNumber(FMath::CeilToInt(CurrentCooldown)));
 	}
-#pragma endregion 실시간 시각화 갱신
 }
 
-void USkillSlotWidget::StopCooldownTimer()
+void USkillSlotWidget::ClearCooldownVisual()
 {
-#pragma region 자원 해제 및 정리
-	/**
-	 * @brief 활성화된 타이머를 중지하고 쿨타임 UI를 초기화합니다.
-	 */
-	if (GetWorld() && CooldownTimerHandle.IsValid())
+	CurrentCooldown = 0.0f;
+
+	if (GetWorld())
 	{
 		GetWorld()->GetTimerManager().ClearTimer(CooldownTimerHandle);
 	}
 
 	if (PB_Cooldown)
 	{
-		PB_Cooldown->SetPercent(0.f);
+		PB_Cooldown->SetPercent(0.0f);
+		PB_Cooldown->SetVisibility(ESlateVisibility::Collapsed); // 드로우 콜 절약
 	}
 
 	if (Text_CooldownTime)
 	{
 		Text_CooldownTime->SetVisibility(ESlateVisibility::Collapsed);
 	}
-#pragma endregion 자원 해제 및 정리
+
+	// 쿨타임 종료 시 버튼 재활성화
+	if (Btn_SkillAction)
+	{
+		Btn_SkillAction->SetIsEnabled(true);
+	}
 }
+#pragma endregion 내부 로직 구현

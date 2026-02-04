@@ -26,12 +26,12 @@ void UActionControlPanel::UpdateSkillCooldown(int32 SkillIndex, float CurrentTim
 	// 기본 스킬 쿨타임 정보 호출
 	if (SkillIndex == 0 && SkillSlot_Active)
 	{
-		SkillSlot_Active->SetCooldownStatus(CurrentTime, MaxTime);
+		SkillSlot_Active->RefreshCooldown(CurrentTime, MaxTime);
 	}
 	// 궁극기 쿨타임 정보 호출
 	else if (SkillIndex == 1 && SkillSlot_Ultimate)
 	{
-		SkillSlot_Ultimate->SetCooldownStatus(CurrentTime, MaxTime);
+		SkillSlot_Ultimate->RefreshCooldown(CurrentTime, MaxTime);
 	}
 }
 
