@@ -8,14 +8,14 @@
 #include "InGameGameState.generated.h"
 
 /**
-* @brief °ÔÀÓ »óÅÂ º¯°æ ½Ã È£ÃâµÇ´Â ´ÙÀÌ³ª¹Í ¸ÖÆ¼Ä³½ºÆ® µ¨¸®°ÔÀÌÆ®
-* @param NewPhase º¯°æµÈ »õ·Î¿î °ÔÀÓ ´Ü°è
+* @brief ê²Œì„ ìƒíƒœ ë³€ê²½ ì‹œ í˜¸ì¶œë˜ëŠ” ë‹¤ì´ë‚˜ë¯¹ ë©€í‹°ìºìŠ¤íŠ¸ ë¸ë¦¬ê²Œì´íŠ¸
+* @param NewPhase ë³€ê²½ëœ ìƒˆë¡œìš´ ê²Œì„ ë‹¨ê³„
  */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGamePhaseChanged, EGamePhase, NewPhase);
 
 /**
  * @class AInGameGameState
- * @brief ÀÎ°ÔÀÓ ÇÃ·¹ÀÌ ÁßÀÇ Àü¿ª »óÅÂ(Å¸ÀÌ¸Ó, ÆäÀÌÁî, º¸»ó Á¤º¸)¸¦ °ü¸®ÇÏ´Â Å¬·¡½ºÀÔ´Ï´Ù.
+ * @brief ì¸ê²Œì„ í”Œë ˆì´ ì¤‘ì˜ ì „ì—­ ìƒíƒœ(íƒ€ì´ë¨¸, í˜ì´ì¦ˆ, ë³´ìƒ ì •ë³´)ë¥¼ ê´€ë¦¬í•˜ëŠ” í´ë˜ìŠ¤ì…ë‹ˆë‹¤.
  */
 UCLASS()
 class PARADISE_API AInGameGameState : public AGameStateBase
@@ -23,38 +23,38 @@ class PARADISE_API AInGameGameState : public AGameStateBase
 	GENERATED_BODY()
 	
 public:
-	//°ÔÀÓ ÁøÇà ´Ü°è ¼³Á¤ ÇÔ¼ö
+	//ê²Œì„ ì§„í–‰ ë‹¨ê³„ ì„¤ì • í•¨ìˆ˜
 	void SetCurrentPhase(EGamePhase NewPhase);
 
-	/** @brief [ÁøÇà] ½ºÅ×ÀÌÁö ³²Àº ½Ã°£ (UI Ç¥½Ã¿ë) */
+	/** @brief [ì§„í–‰] ìŠ¤í…Œì´ì§€ ë‚¨ì€ ì‹œê°„ (UI í‘œì‹œìš©) */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stage Data")
 	float RemainingTime;
 
-	/** @brief [ÁøÇà] ½ºÅ×ÀÌÁö Å¸ÀÌ¸ÓÀÇ È°¼ºÈ­ ¿©ºÎ */
+	/** @brief [ì§„í–‰] ìŠ¤í…Œì´ì§€ íƒ€ì´ë¨¸ì˜ í™œì„±í™” ì—¬ë¶€ */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stage Data")
 	bool bIsTimerActive = false;
 
-	/** @brief [Á¤º¸] È­¸é¿¡ Ç¥½ÃµÉ ÇöÀç ½ºÅ×ÀÌÁö ÀÌ¸§ */
+	/** @brief [ì •ë³´] í™”ë©´ì— í‘œì‹œë  í˜„ì¬ ìŠ¤í…Œì´ì§€ ì´ë¦„ */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stage Data")
 	FString DisplayStageName;
 
-	/** @brief [º¸»ó] ÀÌ¹ø ½ºÅ×ÀÌÁö¿¡¼­ È¹µæÇÑ ´©Àû °ñµå (°á°ú UI¿ë & Ä³¸¯ÅÍ¿ë) */
+	/** @brief [ë³´ìƒ] ì´ë²ˆ ìŠ¤í…Œì´ì§€ì—ì„œ íšë“í•œ ëˆ„ì  ê³¨ë“œ (ê²°ê³¼ UIìš© & ìºë¦­í„°ìš©) */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Reward")
 	int32 AcquiredGold;
 
-	/** @brief [º¸»ó] ÀÌ¹ø ½ºÅ×ÀÌÁö¿¡¼­ È¹µæÇÑ ´©Àû °æÇèÄ¡ (°á°ú UI¿ë & Ä³¸¯ÅÍ¿ë) */
+	/** @brief [ë³´ìƒ] ì´ë²ˆ ìŠ¤í…Œì´ì§€ì—ì„œ íšë“í•œ ëˆ„ì  ê²½í—˜ì¹˜ (ê²°ê³¼ UIìš© & ìºë¦­í„°ìš©) */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Reward")
 	int32 AcquiredExp;
 
-	/** @brief [Á¤º¸] Å¬¸®¾î ÈÄ ÀÌµ¿ÇÒ ´ÙÀ½ ½ºÅ×ÀÌÁö ID */
+	/** @brief [ì •ë³´] í´ë¦¬ì–´ í›„ ì´ë™í•  ë‹¤ìŒ ìŠ¤í…Œì´ì§€ ID */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stage Data")
 	FName NextStageID;
 
-	/** @brief [ÀÌº¥Æ®] °ÔÀÓ ÆäÀÌÁî°¡ º¯°æµÉ ¶§ ¹ß»ıÇÏ´Â µ¨¸®°ÔÀÌÆ® */
+	/** @brief [ì´ë²¤íŠ¸] ê²Œì„ í˜ì´ì¦ˆê°€ ë³€ê²½ë  ë•Œ ë°œìƒí•˜ëŠ” ë¸ë¦¬ê²Œì´íŠ¸ */
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnGamePhaseChanged OnGamePhaseChanged;
 
-	/** @brief [»óÅÂ] ÇöÀç ÁøÇà ÁßÀÎ °ÔÀÓ ÆäÀÌÁî (FSM »óÅÂ°ª) */
+	/** @brief [ìƒíƒœ] í˜„ì¬ ì§„í–‰ ì¤‘ì¸ ê²Œì„ í˜ì´ì¦ˆ (FSM ìƒíƒœê°’) */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stage Data")
 	EGamePhase CurrentPhase;
 };
