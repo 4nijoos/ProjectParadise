@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -11,8 +11,8 @@
 
 /**
  * @class AInGameGameMode
- * @brief °ÔÀÓÀÇ ±ÔÄ¢, ½ºÅ×ÀÌÁö ÁøÇà, ÆäÀÌÁî ÀüÈ¯ ·ÎÁ÷À» ÃÑ°ıÇÏ´Â Å¬·¡½ºÀÔ´Ï´Ù.
- * @details µ¥ÀÌÅÍ Å×ÀÌºí¿¡¼­ ½ºÅ×ÀÌÁö Á¤º¸¸¦ ·ÎµåÇÏ°í, GameState¿Í Çù·ÂÇÏ¿© °ÔÀÓ Èå¸§À» Á¦¾îÇÕ´Ï´Ù.
+ * @brief ê²Œì„ì˜ ê·œì¹™, ìŠ¤í…Œì´ì§€ ì§„í–‰, í˜ì´ì¦ˆ ì „í™˜ ë¡œì§ì„ ì´ê´„í•˜ëŠ” í´ë˜ìŠ¤ì…ë‹ˆë‹¤.
+ * @details ë°ì´í„° í…Œì´ë¸”ì—ì„œ ìŠ¤í…Œì´ì§€ ì •ë³´ë¥¼ ë¡œë“œí•˜ê³ , GameStateì™€ í˜‘ë ¥í•˜ì—¬ ê²Œì„ íë¦„ì„ ì œì–´í•©ë‹ˆë‹¤.
  */
 UCLASS()
 class PARADISE_API AInGameGameMode : public AGameModeBase
@@ -28,51 +28,51 @@ public:
 public:
 
 	/**
-	 * @brief °ÔÀÓ ÆäÀÌÁî¸¦ º¯°æÇÏ°í °ü·Ã ÀÌº¥Æ®¸¦ Æ®¸®°ÅÇÕ´Ï´Ù.
-	 * @param NewPhase º¯°æÇÒ »õ·Î¿î °ÔÀÓ ´Ü°è
+	 * @brief ê²Œì„ í˜ì´ì¦ˆë¥¼ ë³€ê²½í•˜ê³  ê´€ë ¨ ì´ë²¤íŠ¸ë¥¼ íŠ¸ë¦¬ê±°í•©ë‹ˆë‹¤.
+	 * @param NewPhase ë³€ê²½í•  ìƒˆë¡œìš´ ê²Œì„ ë‹¨ê³„
 	 */
 	UFUNCTION(BlueprintCallable, Category = "State")
 	void SetGamePhase(EGamePhase NewPhase);
 
 	/**
-	 * @brief °ÔÀÓ ½ÂÆĞ°¡ °áÁ¤µÇ¾úÀ» ¶§ È£ÃâÇÏ´Â ÇÔ¼ö
-	 * @details Å¸ÀÓ¿À¹ö, ±âÁö ÆÄ±« µî ¸ğµç °ÔÀÓ Á¾·á »óÈ²¿¡¼­ ÀÌ ÇÔ¼ö¸¦ È£ÃâÇÕ´Ï´Ù.
-	 * @param bIsVictory true: ÇÃ·¹ÀÌ¾î ½Â¸® / false: ÇÃ·¹ÀÌ¾î ÆĞ¹è
+	 * @brief ê²Œì„ ìŠ¹íŒ¨ê°€ ê²°ì •ë˜ì—ˆì„ ë•Œ í˜¸ì¶œí•˜ëŠ” í•¨ìˆ˜
+	 * @details íƒ€ì„ì˜¤ë²„, ê¸°ì§€ íŒŒê´´ ë“± ëª¨ë“  ê²Œì„ ì¢…ë£Œ ìƒí™©ì—ì„œ ì´ í•¨ìˆ˜ë¥¼ í˜¸ì¶œí•©ë‹ˆë‹¤.
+	 * @param bIsVictory true: í”Œë ˆì´ì–´ ìŠ¹ë¦¬ / false: í”Œë ˆì´ì–´ íŒ¨ë°°
 	 */
 	UFUNCTION(BlueprintCallable, Category = "GameRules")
 	void EndStage(bool bIsVictory);
 
 protected:
 	/**
-	 * @brief µ¥ÀÌÅÍ Å×ÀÌºí·ÎºÎÅÍ ½ºÅ×ÀÌÁö Á¤º¸¸¦ ÀĞ¾î¿Í ÃÊ±âÈ­ÇÕ´Ï´Ù.
-	 * @param StageID ·ÎµåÇÒ ½ºÅ×ÀÌÁöÀÇ °íÀ¯ ID
+	 * @brief ë°ì´í„° í…Œì´ë¸”ë¡œë¶€í„° ìŠ¤í…Œì´ì§€ ì •ë³´ë¥¼ ì½ì–´ì™€ ì´ˆê¸°í™”í•©ë‹ˆë‹¤.
+	 * @param StageID ë¡œë“œí•  ìŠ¤í…Œì´ì§€ì˜ ê³ ìœ  ID
 	 */
 	void InitializeStageData(FName StageID);
 
 	/** @name Phase Transition Handlers
-	 * °¢ ÆäÀÌÁî ÁøÀÔ ½Ã ³»ºÎ ·ÎÁ÷À» Ã³¸®ÇÏ´Â ÇÔ¼ö±ºÀÔ´Ï´Ù.
+	 * ê° í˜ì´ì¦ˆ ì§„ì… ì‹œ ë‚´ë¶€ ë¡œì§ì„ ì²˜ë¦¬í•˜ëŠ” í•¨ìˆ˜êµ°ì…ë‹ˆë‹¤.
 	 * @{ */
-	void OnPhaseReady();	///< [ÁØºñ] Ä«¿îÆ®´Ù¿î Ã³¸®
-	void OnPhaseCombat();	///< [ÀüÅõ] ¸ó½ºÅÍ ½ºÆù ¹× ÀüÅõ ÁøÇà
-	void OnPhaseVictory();	///< [½Â¸®] ½Â¸® Ã³¸® ¹× °á°úÃ¢ ÁØºñ
-	void OnPhaseDefeat();	///< [ÆĞ¹è] ÆĞ¹è Ã³¸® ¹× °á°úÃ¢ ÁØºñ
-	void OnPhaseResult();	///< [°á°ú] °á°úÃ¢ Ç¥½Ã ¹× ·¹º§ ÀÌµ¿ ÁØºñ
+	void OnPhaseReady();	///< [ì¤€ë¹„] ì¹´ìš´íŠ¸ë‹¤ìš´ ì²˜ë¦¬
+	void OnPhaseCombat();	///< [ì „íˆ¬] ëª¬ìŠ¤í„° ìŠ¤í° ë° ì „íˆ¬ ì§„í–‰
+	void OnPhaseVictory();	///< [ìŠ¹ë¦¬] ìŠ¹ë¦¬ ì²˜ë¦¬ ë° ê²°ê³¼ì°½ ì¤€ë¹„
+	void OnPhaseDefeat();	///< [íŒ¨ë°°] íŒ¨ë°° ì²˜ë¦¬ ë° ê²°ê³¼ì°½ ì¤€ë¹„
+	void OnPhaseResult();	///< [ê²°ê³¼] ê²°ê³¼ì°½ í‘œì‹œ ë° ë ˆë²¨ ì´ë™ ì¤€ë¹„
 	/** @} */
 
 
 protected:
-	/** @brief [¼³Á¤] ½ºÅ×ÀÌÁö Á¤º¸°¡ ÀúÀåµÈ µ¥ÀÌÅÍ Å×ÀÌºí */
+	/** @brief [ì„¤ì •] ìŠ¤í…Œì´ì§€ ì •ë³´ê°€ ì €ì¥ëœ ë°ì´í„° í…Œì´ë¸” */
 	UPROPERTY(EditDefaultsOnly, Category = "Data")
 	UDataTable* StageInfoTable;
 
-	/** @brief [Ä³½Ì] Àü¿ª »óÅÂ °ü¸®¸¦ À§ÇÑ GameState Æ÷ÀÎÅÍ */
+	/** @brief [ìºì‹±] ì „ì—­ ìƒíƒœ ê´€ë¦¬ë¥¼ ìœ„í•œ GameState í¬ì¸í„° */
 	UPROPERTY()
 	class AInGameGameState* CachedGameState;
 
-	/** @brief [µ¥ÀÌÅÍ] ÇöÀç ÁøÇà ÁßÀÎ ½ºÅ×ÀÌÁöÀÇ »ó¼¼ ½ºÅÈ(½Ã°£, º¸»ó µî) */
+	/** @brief [ë°ì´í„°] í˜„ì¬ ì§„í–‰ ì¤‘ì¸ ìŠ¤í…Œì´ì§€ì˜ ìƒì„¸ ìŠ¤íƒ¯(ì‹œê°„, ë³´ìƒ ë“±) */
 	FStageStats CurrentStageData;
 
-	/** @brief [»óÅÂ] ÇöÀç °ÔÀÓ ÆäÀÌÁî ´Ü°è */
+	/** @brief [ìƒíƒœ] í˜„ì¬ ê²Œì„ í˜ì´ì¦ˆ ë‹¨ê³„ */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State")
 	EGamePhase CurrentPhase;
 	
