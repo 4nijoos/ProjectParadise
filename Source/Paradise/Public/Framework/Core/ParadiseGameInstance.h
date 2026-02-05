@@ -7,6 +7,10 @@
 #include "Engine/StreamableManager.h"
 #include "ParadiseGameInstance.generated.h"
 
+#pragma region 전방 선언
+class ULoadingWidget;
+#pragma endregion 전방 선언
+
 /**
  * @class UParadiseGameInstance
  * @brief 게임의 수명 주기 동안 유지되는 전역 데이터 및 시스템 관리 클래스.
@@ -48,7 +52,7 @@ protected:
 private:
 	/** @brief 현재 화면에 떠 있는 로딩 위젯 인스턴스. */
 	UPROPERTY()
-	TObjectPtr<UUserWidget> CurrentLoadingWidget = nullptr;
+	TObjectPtr<ULoadingWidget> CurrentLoadingWidget = nullptr;
 
 	/** @brief 이동할 목표 레벨 이름 임시 저장. */
 	FName NextLevelName;

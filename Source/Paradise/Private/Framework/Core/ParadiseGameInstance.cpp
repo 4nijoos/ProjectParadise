@@ -3,6 +3,8 @@
 
 #include "Framework/Core/ParadiseGameInstance.h"
 
+#include "UI/Widgets/Loading/LoadingWidget.h"
+
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/UserWidget.h"
 #include "TimerManager.h"
@@ -32,10 +34,13 @@ void UParadiseGameInstance::OpenLevelWithAsyncLoad(FName LevelName, const TArray
 	// 1. 로딩 위젯 생성 및 표시
 	if (LoadingWidgetClass)
 	{
-		CurrentLoadingWidget = CreateWidget<UUserWidget>(this, LoadingWidgetClass);
+		// ULoadingWidget으로 바로 생성
+		CurrentLoadingWidget = CreateWidget<ULoadingWidget>(this, LoadingWidgetClass);
+
 		if (CurrentLoadingWidget)
 		{
-			CurrentLoadingWidget->AddToViewport(9999); // 최상위 레이어에 표시
+			CurrentLoadingWidget->AddToViewport(9999); // 최상위 Z-Order
+			CurrentLoadingWidget->SetLoadingPercent(0.0f); // 초기화
 		}
 	}
 	else
@@ -59,8 +64,11 @@ void UParadiseGameInstance::OpenLevelWithAsyncLoad(FName LevelName, const TArray
 		CurrentLoadHandle = StreamableManager.RequestAsyncLoad(AssetPaths);
 	}
 
-	// 4. 진행률 체크 타이머 시작 (0.1초마다 체크)
-	GetWorld()->GetTimerManager().SetTimer(ProgressTimerHandle, this, &UParadiseGameInstance::UpdateLoadingProgress, 0.1f, true);
+	// 4. 타이머 시작 (0.1초 간격)
+	if (GetWorld())
+	{
+		GetWorld()->GetTimerManager().SetTimer(ProgressTimerHandle, this, &UParadiseGameInstance::UpdateLoadingProgress, 0.1f, true);
+	}
 
 	UE_LOG(LogTemp, Log, TEXT("[ParadiseGameInstance] Start Async Loading for Level: %s"), *LevelName.ToString());
 }
@@ -76,12 +84,13 @@ void UParadiseGameInstance::UpdateLoadingProgress()
 		AssetLoadProgress = CurrentLoadHandle->GetProgress();
 	}
 
-	// TODO: 로딩 위젯에 진행률 반영 (Interface나 Cast 활용)
-	// if (ULoadingWidget* Widget = Cast<ULoadingWidget>(CurrentLoadingWidget)) {
-	//     Widget->SetProgress(AssetLoadProgress);
-	// }
+	// 2. 로딩 위젯 호출
+	if (CurrentLoadingWidget)
+	{
+		CurrentLoadingWidget->SetLoadingPercent(AssetLoadProgress);
+	}
 
-	// 2. 로딩 완료 조건 체크
+	// 3. 로딩 완료 조건 체크
 	// (에셋 로딩 완료) AND (최소 로딩 시간 경과)
 	if (AssetLoadProgress >= 1.0f && TotalElapsedTime >= MinLoadingTime)
 	{
@@ -97,7 +106,7 @@ void UParadiseGameInstance::UpdateLoadingProgress()
 			CurrentLoadingWidget = nullptr;
 		}
 
-		// 3. 레벨 이동
+		// 4. 레벨 이동
 		UGameplayStatics::OpenLevel(this, NextLevelName);
 		UE_LOG(LogTemp, Log, TEXT("[ParadiseGameInstance] Open Level: %s"), *NextLevelName.ToString());
 	}
