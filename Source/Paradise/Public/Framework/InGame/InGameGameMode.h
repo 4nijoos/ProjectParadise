@@ -8,15 +8,15 @@
 #include "Data/Structs/StageStructs.h"
 #include "InGameGameMode.generated.h"
 
-//1. ╟тюс ╩Себ а╓юг
+//1. О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫
 UENUM(BlueprintType)
 enum class EGamePhase : uint8
 {
-	Ready,		//╫╨евюлаЖ аЬют хд д╚©Нф╝╢ы©Н(аь╨Я)
-	Combat,		//╨╩╟щюШюн юЭеУ ╧в е╦юл╦с юш╣©
-	Victory,	//╫б╦╝(╨╦╩С аЖ╠ч)
-	Defeat,		//фп╧Х(е╦юс©ю╧Ж ╤г╢б ╩Г╦а)
-	Result		//╟А╟Зц╒ г╔╫ц хд ╥н╨Я юл╣© ╢К╠Б
+	Ready,		//О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫ О©╫О©╫ д╚О©╫О©╫ф╝О©╫ы©О©╫(О©╫ь╨О©╫)
+	Combat,		//О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫ О©╫О©╫ е╦О©╫л╦О©╫ О©╫ш╣О©╫
+	Victory,	//О©╫б╦О©╫(О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫)
+	Defeat,		//О©╫п╧О©╫(е╦О©╫с©О©╫О©╫О©╫ О©╫г╢О©╫ О©╫О©╫О©╫)
+	Result		//О©╫О©╫О©╫ц╒ г╔О©╫О©╫ О©╫О©╫ О©╫н╨О©╫ О©╫л╣О©╫ О©╫О©╫О©╫
 };
 
 /**
@@ -35,7 +35,7 @@ public:
 	
 public:
 
-	//╟тюс╩Себ ╨╞╟Фго╢б гт╪Ж
+	//О©╫О©╫О©╫с╩О©╫О©╫О©╫ О©╫О©╫О©╫О©╫О©╫о╢О©╫ О©╫т╪О©╫
 	UFUNCTION(BlueprintCallable, Category = "State")
 	void SetGamePhase(EGamePhase NewPhase);
 
@@ -44,10 +44,10 @@ public:
 	void EndStage(bool bIsVictory);
 
 protected:
-	//╣╔юлемевюл╨М юп╬Н ╫╨евюлаЖ а╓╨╦ цй╠Бх╜
+	//О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫л╨О©╫ О©╫п╬О©╫ О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫ О©╫й╠О©╫х╜
 	void InitializeStageData(FName StageID);
 
-	//╟╒ ╢э╟Х©║ аЬютгр ▀  хёцБ╣г╢б гт╪Ж╣И
+	//О©╫О©╫ О©╫э╟Х©║ О©╫О©╫О©╫О©╫О©╫О©╫ О©╫О©╫ хёО©╫О©╫г╢О©╫ О©╫т╪О©╫О©╫О©╫
 	void OnPhaseReady();
 	void OnPhaseCombat();
 	void OnPhaseVictory();
@@ -57,18 +57,18 @@ protected:
 
 
 protected:
-	//©║╣Пем©║ ╫╨евюлаЖ а╓╨╦ гр╢Г 
+	//О©╫О©╫О©╫О©╫О©╫м©О©╫ О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫ О©╫р╢О©╫ 
 	UPROPERTY(EditDefaultsOnly, Category = "Data")
 	UDataTable* StageInfoTable;
 
-	//дЁ╫л╣х ╟тюс╫╨евюлф╝ фВюнем
+	//дЁО©╫л╣О©╫ О©╫О©╫О©╫с╫О©╫О©╫О©╫О©╫О©╫ф╝ О©╫О©╫О©╫О©╫О©╫О©╫
 	UPROPERTY()
 	class AInGameGameState* CachedGameState;
 
-	//гЖюГ ╫╨евюлаЖ юЭц╪ а╓╨╦
+	//О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫ О©╫О©╫ц╪ О©╫О©╫О©╫О©╫
 	FStageStats CurrentStageData;
 
-	//гЖюГ ╟тюсюг ╢э╟Х(©э╨н©║╪╜ фг╢э╟║╢и)
+	//О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫О©╫О©╫ О©╫э╟О©╫(О©╫э╨н©О©╫О©╫О©╫ О©╫г╢э╟О©╫О©╫О©╫)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State")
 	EGamePhase CurrentPhase;
 	
