@@ -46,7 +46,6 @@ void APlayerData::InitStatsFromDataTable(const FDataTableRowHandle& InDataHandle
     {
         InitCombatAttributes(Stats);
         UE_LOG(LogTemp, Log, TEXT("✅ [PlayerData] 초기화 완료: %s"), *CharacterStatsDataHandle.RowName.ToString());
-
     }
     else
     {

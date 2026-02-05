@@ -72,10 +72,21 @@ void AMyAIController::OnPossess(APawn* InPawn)
 
 void AMyAIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
 {
-    if (Blackboard == nullptr) return;
+    if (Blackboard == nullptr || Actor == nullptr) return;
+
+    if (Actor->IsHidden())
+    {
+        AActor* CurrentTarget = Cast<AActor>(Blackboard->GetValueAsObject(BB_KEYS::TargetActor));
+        if (CurrentTarget == Actor)
+        {
+            Blackboard->ClearValue(BB_KEYS::TargetActor);
+        }
+        return;
+    }
 
     AActor* CurrentTarget = Cast<AActor>(Blackboard->GetValueAsObject(BB_KEYS::TargetActor));
 
+    // 이미 타겟이 있는 경우 처리
     if (CurrentTarget && CurrentTarget->IsValidLowLevel())
     {
         if (CurrentTarget == Actor && !Stimulus.WasSuccessfullySensed())
@@ -85,6 +96,7 @@ void AMyAIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
         return;
     }
 
+    // 새로운 타겟 감지 로직
     if (Stimulus.WasSuccessfullySensed())
     {
         ABaseUnit* TargetUnit = Cast<ABaseUnit>(Actor);
