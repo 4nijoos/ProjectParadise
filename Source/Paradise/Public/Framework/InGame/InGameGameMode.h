@@ -5,19 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "Engine/DataTable.h"
+#include "Data/Enums/GameEnums.h"
 #include "Data/Structs/StageStructs.h"
 #include "InGameGameMode.generated.h"
-
-//1. 게임 상태 정의
-UENUM(BlueprintType)
-enum class EGamePhase : uint8
-{
-	Ready,		//스테이지 진입 후 카운트다운(준비)
-	Combat,		//본격적인 전투 및 타이머 작동
-	Victory,	//승리(보상 지급)
-	Defeat,		//패배(타임오버 또는 사망)
-	Result		//결과창 표시 후 로비 이동 대기
-};
 
 /**
  * 
