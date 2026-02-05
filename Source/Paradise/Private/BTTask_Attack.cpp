@@ -2,6 +2,8 @@
 
 #include "BTTask_Attack.h"
 #include "AIController.h"
+#include "Kismet/GameplayStatics.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 /**
  * @brief 생성자: 노드의 이름을 "Attack Target"으로 초기화합니다.
@@ -17,13 +19,21 @@ UBTTask_Attack::UBTTask_Attack()
 EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
     AAIController* AIController = OwnerComp.GetAIOwner();
+    UBlackboardComponent* BB = OwnerComp.GetBlackboardComponent();
+    if (!AIController || !BB) return EBTNodeResult::Failed;
 
-    if (AIController)
+    APawn* ControllingPawn = AIController->GetPawn();
+
+    AActor* Target = Cast<AActor>(BB->GetValueAsObject(TEXT("TargetActor")));
+    if (!Target)
     {
-        APawn* ControlledPawn = AIController->GetPawn();
-        FString MonsterName = ControlledPawn ? ControlledPawn->GetName() : TEXT("Unknown Monster");
+        Target = Cast<AActor>(BB->GetValueAsObject(TEXT("HomeBaseActor")));
+    }
 
-        UE_LOG(LogTemp, Warning, TEXT("[%s] 타겟을 공격했습니다! (Damage: 10)"), *MonsterName);
+    if (Target)
+    {
+        float DamageAmount = 20.0f;
+        UGameplayStatics::ApplyDamage(Target, DamageAmount, AIController, ControllingPawn, nullptr);
 
         return EBTNodeResult::Succeeded;
     }

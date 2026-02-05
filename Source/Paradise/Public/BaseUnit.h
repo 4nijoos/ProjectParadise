@@ -30,8 +30,6 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Unit Stat")
     float MaxHP;
 
-    /**
-     * @brief 데미지를 입었을 때 엔진에 의해 호출되는 함수입니다.
-     */
-    virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+    // 언리얼 기본 데미지 함수 오버라이드
+    virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 };
