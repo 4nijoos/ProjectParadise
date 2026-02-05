@@ -35,8 +35,9 @@ public:
 	void SetGamePhase(EGamePhase NewPhase);
 
 	/**
-	 * @brief 승리 또는 패배 조건에 따라 스테이지를 종료시킵니다.
-	 * @param bIsVictory 승리 여부 (True: 승리, False: 패배)
+	 * @brief 게임 승패가 결정되었을 때 호출하는 함수
+	 * @details 타임오버, 기지 파괴 등 모든 게임 종료 상황에서 이 함수를 호출합니다.
+	 * @param bIsVictory true: 플레이어 승리 / false: 플레이어 패배
 	 */
 	UFUNCTION(BlueprintCallable, Category = "GameRules")
 	void EndStage(bool bIsVictory);
