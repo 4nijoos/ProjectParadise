@@ -33,22 +33,24 @@ protected:
 public:
 	/**
 	 * @brief 승리 데이터를 설정합니다.
+	 * @param InStageName 스테이지 이름
 	 * @param InStarCount 별 개수
 	 * @param InEarnedGold 획득 골드
-	 * @param InEarnedExp 획득 경험치
+	 * @param InEarnedGem 획득 보석
 	 * @param InCharacterResults 캐릭터별 결과 데이터 배열
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Paradise|UI|Result")
 	void SetVictoryData(
+		FText InStageName,
 		int32 InStarCount, 
-		int32 InEarnedGold, 
+		int32 InEarnedGem,
 		int32 InEarnedExp, 
 		const TArray<FResultCharacterData>& InCharacterResults);
 #pragma endregion 외부 인터페이스
 
 #pragma region 승리 전용 UI
 protected:
-	/** @brief 캐릭터 슬롯들을 관리하는 패널 위젯 (새로 추가됨). */
+	/** @brief 캐릭터 슬롯들을 관리하는 패널 위젯 */
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UResultCharacterPanelWidget> WBP_CharacterResultPanel = nullptr;
 
@@ -60,9 +62,13 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> Text_GoldValue = nullptr;
 
-	/** @brief 획득 경험치 표시 텍스트. */
+	/** @brief 스테이지 이름 텍스트. */
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> Text_ExpValue = nullptr;
+	TObjectPtr<UTextBlock> Text_Stage = nullptr;
+
+	/** @brief 획득 보석 표시 텍스트. */
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> Text_GemValue = nullptr;
 
 	/** @brief 첫 번째 별 이미지. */
 	UPROPERTY(meta = (BindWidget))

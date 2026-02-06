@@ -21,19 +21,22 @@ void UVictoryPopupWidget::NativeConstruct()
 }
 
 #pragma region 데이터 설정
-void UVictoryPopupWidget::SetVictoryData(int32 InStarCount, int32 InEarnedGold, int32 InEarnedExp, const TArray<FResultCharacterData>& InCharacterResults)
+void UVictoryPopupWidget::SetVictoryData(FText InStageName, int32 InStarCount, int32 InEarnedGold, int32 InEarnedGem, const TArray<FResultCharacterData>& InCharacterResults)
 {
-	UE_LOG(LogTemp, Log, TEXT("[VictoryPopup] 데이터 갱신 - 별:%d, 골드:%d, 경험치:%d"), InStarCount, InEarnedGold, InEarnedExp);
+	UE_LOG(LogTemp, Log, TEXT("[VictoryPopup] 데이터 갱신 - 별:%d, 골드:%d, 경험치:%d"), InStarCount, InEarnedGold, InEarnedGem);
 
 	// 1. 텍스트 갱신
+	if (Text_Stage)
+	{
+		Text_Stage->SetText(InStageName);
+	}
 	if (Text_GoldValue)
 	{
 		Text_GoldValue->SetText(FText::AsNumber(InEarnedGold));
 	}
-
-	if (Text_ExpValue)
+	if (Text_GemValue)
 	{
-		Text_ExpValue->SetText(FText::AsNumber(InEarnedExp));
+		Text_GemValue->SetText(FText::AsNumber(InEarnedGem));
 	}
 
 	// 2. 별 이미지 갱신 (리소스가 설정된 경우에만)

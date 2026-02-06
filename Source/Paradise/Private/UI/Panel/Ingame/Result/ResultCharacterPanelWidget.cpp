@@ -3,6 +3,7 @@
 
 #include "UI/Panel/Ingame/Result/ResultCharacterPanelWidget.h"
 #include "UI/Widgets/Ingame/Result/ResultCharacterSlotWidget.h"
+#include "Components/HorizontalBoxSlot.h"
 #include "Components/PanelWidget.h"
 
 void UResultCharacterPanelWidget::NativeConstruct()
@@ -37,8 +38,20 @@ void UResultCharacterPanelWidget::UpdateCharacterSlots(const TArray<FResultChara
 			// 데이터 주입
 			NewSlot->SetSlotData(Data);
 
-			// 컨테이너에 추가
-			Container_Slots->AddChild(NewSlot);
+			// (1) 컨테이너에 추가하고, 슬롯 객체 리턴
+			UPanelSlot* PanelSlot = Container_Slots->AddChild(NewSlot);
+
+			// (2) HorizontalBoxSlot으로 형변환하여 "에디터 설정값" 적용
+			if (UHorizontalBoxSlot* HorizSlot = Cast<UHorizontalBoxSlot>(PanelSlot))
+			{
+				// 하드코딩 제거 -> 변수(UPROPERTY) 사용
+				HorizSlot->SetPadding(SlotPadding);
+				HorizSlot->SetHorizontalAlignment(SlotHorizontalAlignment);
+				HorizSlot->SetVerticalAlignment(SlotVerticalAlignment);
+
+				// 사이즈 정책 적용
+				HorizSlot->SetSize(FSlateChildSize(SlotSizeRule));
+			}
 		}
 	}
 

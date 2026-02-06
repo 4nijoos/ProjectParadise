@@ -49,4 +49,23 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UPanelWidget> Container_Slots = nullptr;
 #pragma endregion UI 바인딩
+
+#pragma region 레이아웃 설정 (Layout Config)
+protected:
+	/** @brief 슬롯 간의 간격 및 여백 설정 (기본값: 좌우 20). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Paradise|Layout")
+	FMargin SlotPadding = FMargin(20.0f, 0.0f, 20.0f, 0.0f);
+
+	/** @brief 가로 정렬 방식 (Left, Center, Right, Fill). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Paradise|Layout")
+	TEnumAsByte<EHorizontalAlignment> SlotHorizontalAlignment = HAlign_Center;
+
+	/** @brief 세로 정렬 방식 (Top, Center, Bottom, Fill). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Paradise|Layout")
+	TEnumAsByte<EVerticalAlignment> SlotVerticalAlignment = VAlign_Center;
+
+	/** @brief 크기 정책 (Automatic: 내용물 크기만큼, Fill: 남은 공간 꽉 채우기). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Paradise|Layout")
+	TEnumAsByte<ESlateSizeRule::Type> SlotSizeRule = ESlateSizeRule::Automatic;
+#pragma endregion 레이아웃 설정
 };

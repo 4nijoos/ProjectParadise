@@ -125,6 +125,10 @@ void UInGameHUDWidget::HandleGamePhaseChanged(EGamePhase NewPhase)
 	case EGamePhase::Victory:
 		if (Widget_VictoryPopup && CachedGameState.IsValid())
 		{
+			// TODO: 나중에는 GameState나 StageDataTable에서 실제 현재 스테이지 이름을 가져와야 함.
+			// 지금은 테스트용으로 하드코딩.
+			FText CurrentStageName = FText::FromString(TEXT("STAGE 1-1"));
+
 			// 1. 재화 정보
 			int32 Gold = CachedGameState->AcquiredGold;
 			int32 Exp = CachedGameState->AcquiredExp;
@@ -145,7 +149,13 @@ void UInGameHUDWidget::HandleGamePhaseChanged(EGamePhase NewPhase)
 			}
 
 			// 3. 팝업 호출 (팝업 -> 패널 -> 슬롯 순으로 데이터가 전파됨)
-			Widget_VictoryPopup->SetVictoryData(Stars, Gold, Exp, CharResults);
+			Widget_VictoryPopup->SetVictoryData(
+				CurrentStageName,
+				Stars,
+				Gold,
+				Exp,
+				CharResults
+			);
 
 			// 4. 표시
 			Widget_VictoryPopup->SetVisibility(ESlateVisibility::Visible);
