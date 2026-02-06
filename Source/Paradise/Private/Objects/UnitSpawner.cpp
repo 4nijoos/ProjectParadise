@@ -35,7 +35,9 @@ void AUnitSpawner::SpawnUnit()
 {
 	UParadiseGameInstance* GI = Cast<UParadiseGameInstance>(GetGameInstance());
 	UObjectPoolSubsystem* PoolSubsystem = GetWorld()->GetSubsystem<UObjectPoolSubsystem>();
-	if (!GI || !PoolSubsystem || EnemyRowName.IsNone()) return;
+
+	// 유효성 검사: GI, 풀, 테이블, 행 이름 확인
+	if (!GI || !PoolSubsystem || !StatsDataTable || !AssetsDataTable || EnemyRowName.IsNone()) return;
 
 	FVector FootLocation = GetRandomSpawnLocation();
 	FVector SpawnLocation = FootLocation + FVector(0.f, 0.f, 2.0f);
@@ -47,8 +49,10 @@ void AUnitSpawner::SpawnUnit()
 	{
 		NewUnit->SetActorLocationAndRotation(SpawnLocation, SpawnRotation, false, nullptr, ETeleportType::ResetPhysics);
 
-		FEnemyStats* StatData = GI->GetDataTableRow<FEnemyStats>(GI->EnemyStatsDataTable, EnemyRowName);
-		FEnemyAssets* AssetData = GI->GetDataTableRow<FEnemyAssets>(GI->EnemyAssetsDataTable, EnemyRowName);
+		// 설정된 데이터 테이블에서 데이터 찾기
+		FEnemyStats* StatData = StatsDataTable->FindRow<FEnemyStats>(EnemyRowName, TEXT(""));
+		FEnemyAssets* AssetData = AssetsDataTable->FindRow<FEnemyAssets>(EnemyRowName, TEXT(""));
+
 		NewUnit->InitializeUnit(StatData, AssetData);
 
 		if (AssetData)
@@ -62,6 +66,7 @@ void AUnitSpawner::SpawnUnit()
 
 			if (AIC)
 			{
+				// 요청하신 대로 Possess 코드 유지
 				AIC->Possess(NewUnit);
 
 				FTimerHandle AIStartTimer;

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Engine/DataTable.h" // 데이터 테이블 사용을 위해 추가
 #include "UnitSpawner.generated.h"
 
 UCLASS()
@@ -23,6 +24,15 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Spawning")
 	TSubclassOf<class ABaseUnit> UnitClass;
 
+	/** @brief 사용할 스탯 데이터 테이블 */
+	UPROPERTY(EditAnywhere, Category = "Spawning|Data")
+	UDataTable* StatsDataTable;
+
+	/** @brief 사용할 에셋 데이터 테이블 */
+	UPROPERTY(EditAnywhere, Category = "Spawning|Data")
+	UDataTable* AssetsDataTable;
+
+	/** @brief 기존 행 이름 변수 유지 */
 	UPROPERTY(EditAnywhere, Category = "Spawning|Data")
 	FName EnemyRowName;
 
