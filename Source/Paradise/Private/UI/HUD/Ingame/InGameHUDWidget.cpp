@@ -123,19 +123,32 @@ void UInGameHUDWidget::HandleGamePhaseChanged(EGamePhase NewPhase)
 	switch (NewPhase)
 	{
 	case EGamePhase::Victory:
-		// 승리 팝업 표시 및 데이터 설정
 		if (Widget_VictoryPopup && CachedGameState.IsValid())
 		{
-			// ★ 중요: 여기서 GameState의 최종 데이터를 가져와서 한 번만 설정
-			int32 EarnedGold = CachedGameState->AcquiredGold;
-			int32 EarnedExp = CachedGameState->AcquiredExp;
+			// 1. 재화 정보
+			int32 Gold = CachedGameState->AcquiredGold;
+			int32 Exp = CachedGameState->AcquiredExp;
+			int32 Stars = 3;
 
-			// 별 개수 계산 로직이 있다면 여기서 수행 (예시: 3개 고정)
-			Widget_VictoryPopup->SetVictoryData(3, EarnedGold, EarnedExp);
+			// 2. 캐릭터 데이터 구성 (여기서 데이터를 만드는 건 필수입니다. 나중에 GameState에서 가져오더라도요.)
+			// 다만, 이제 이 데이터를 위젯이 직접 파싱하는 게 아니라 구조체로 묶어서 통째로 넘깁니다.
+			TArray<FResultCharacterData> CharResults;
+
+			// TODO: 실제로는 GameState->GetParticipatedCharacters() 등으로 루프를 돌며 채워야 함
+			for (int i = 0; i < 3; i++)
+			{
+				FResultCharacterData DummyData;
+				DummyData.CharacterName = FText::FromString(FString::Printf(TEXT("Hero %d"), i + 1));
+				DummyData.GainedExp = 150;
+				DummyData.ExpPercent = 0.5f;
+				CharResults.Add(DummyData);
+			}
+
+			// 3. 팝업 호출 (팝업 -> 패널 -> 슬롯 순으로 데이터가 전파됨)
+			Widget_VictoryPopup->SetVictoryData(Stars, Gold, Exp, CharResults);
+
+			// 4. 표시
 			Widget_VictoryPopup->SetVisibility(ESlateVisibility::Visible);
-
-			// 패배 팝업은 확실히 끄기
-			if (Widget_DefeatPopup) Widget_DefeatPopup->SetVisibility(ESlateVisibility::Collapsed);
 		}
 		break;
 

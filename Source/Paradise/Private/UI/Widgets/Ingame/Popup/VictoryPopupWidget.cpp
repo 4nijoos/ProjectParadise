@@ -2,6 +2,7 @@
 
 
 #include "UI/Widgets/Ingame/Popup/VictoryPopupWidget.h"
+#include "UI/Panel/Ingame/Result/ResultCharacterPanelWidget.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
@@ -20,7 +21,7 @@ void UVictoryPopupWidget::NativeConstruct()
 }
 
 #pragma region 데이터 설정
-void UVictoryPopupWidget::SetVictoryData(int32 InStarCount, int32 InEarnedGold, int32 InEarnedExp)
+void UVictoryPopupWidget::SetVictoryData(int32 InStarCount, int32 InEarnedGold, int32 InEarnedExp, const TArray<FResultCharacterData>& InCharacterResults)
 {
 	UE_LOG(LogTemp, Log, TEXT("[VictoryPopup] 데이터 갱신 - 별:%d, 골드:%d, 경험치:%d"), InStarCount, InEarnedGold, InEarnedExp);
 
@@ -42,6 +43,15 @@ void UVictoryPopupWidget::SetVictoryData(int32 InStarCount, int32 InEarnedGold, 
 		if (Img_Star1) Img_Star1->SetBrushFromTexture(InStarCount >= 1 ? StarOnTexture : StarOffTexture);
 		if (Img_Star2) Img_Star2->SetBrushFromTexture(InStarCount >= 2 ? StarOnTexture : StarOffTexture);
 		if (Img_Star3) Img_Star3->SetBrushFromTexture(InStarCount >= 3 ? StarOnTexture : StarOffTexture);
+	}
+	if (WBP_CharacterResultPanel)
+	{
+		// 팝업은 더 이상 슬롯을 직접 생성하지 않습니다. 패널에게 데이터만 넘깁니다.
+		WBP_CharacterResultPanel->UpdateCharacterSlots(InCharacterResults);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[VictoryPopup] WBP_CharacterResultPanel이 바인딩되지 않았습니다."));
 	}
 }
 #pragma endregion 데이터 설정

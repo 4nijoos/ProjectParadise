@@ -4,21 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "UI/Widgets/Ingame/Popup/GameResultWidgetBase.h"
+#include "UI/Widgets/Ingame/Result/ResultCharacterSlotWidget.h"
 #include "VictoryPopupWidget.generated.h"
 
 #pragma region 전방 선언
 class UTextBlock;
 class UImage;
 class UTexture2D;
+class UResultCharacterPanelWidget;
 #pragma endregion 전방 선언
 
 /**
  * @class UVictoryPopupWidget
  * @brief 게임 승리 시 표시되는 팝업 위젯.
  * @details
- * 1. 외부 데이터를 주입받아(SetVictoryData) UI를 갱신하는 데이터 주도 방식.
- * 2. 별점(1~3성)에 따른 이미지 교체 로직 포함.
- * 3. 다음 스테이지 이동 기능 제공.
+ * 1. 보상(골드, 경험치, 별)을 표시합니다.
+ * 2. 캐릭터 목록 표시는 하위 컴포넌트인 ResultCharacterPanelWidget에게 위임합니다.
  */
 UCLASS()
 class PARADISE_API UVictoryPopupWidget : public UGameResultWidgetBase
@@ -31,17 +32,26 @@ protected:
 #pragma region 외부 인터페이스
 public:
 	/**
-	 * @brief 승리 결과 데이터를 설정하고 UI를 갱신합니다.
-	 * @param InStarCount 획득한 별 개수 (1~3)
-	 * @param InEarnedGold 획득 골드량
-	 * @param InEarnedExp 획득 경험치량
+	 * @brief 승리 데이터를 설정합니다.
+	 * @param InStarCount 별 개수
+	 * @param InEarnedGold 획득 골드
+	 * @param InEarnedExp 획득 경험치
+	 * @param InCharacterResults 캐릭터별 결과 데이터 배열
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Paradise|UI|Result")
-	void SetVictoryData(int32 InStarCount, int32 InEarnedGold, int32 InEarnedExp);
+	void SetVictoryData(
+		int32 InStarCount, 
+		int32 InEarnedGold, 
+		int32 InEarnedExp, 
+		const TArray<FResultCharacterData>& InCharacterResults);
 #pragma endregion 외부 인터페이스
 
 #pragma region 승리 전용 UI
 protected:
+	/** @brief 캐릭터 슬롯들을 관리하는 패널 위젯 (새로 추가됨). */
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UResultCharacterPanelWidget> WBP_CharacterResultPanel = nullptr;
+
 	/** @brief 다음 스테이지로 이동 버튼. */
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UButton> Btn_NextStage = nullptr;
