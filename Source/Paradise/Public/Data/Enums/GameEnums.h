@@ -69,6 +69,7 @@ enum class EUnitType : uint8
 	Legendary	UMETA(DisplayName = "Legendary (5 Star)")
 };
 
+<<<<<<< HEAD
 	/**
 	 * @enum ECombatActionType
 	 * @brief 현재 수행하려는 공격의 종류를 구분합니다.
@@ -81,3 +82,27 @@ enum class EUnitType : uint8
 		WeaponSkill,  // 무기 스킬 (RMB, Q 등) - 계수 1.5 (WeaponStats 참조)
 		UltimateSkill // 궁극기 (R) - 계수 3.0 (CharacterStats 참조)
 	};
+=======
+
+/**
+* @enum EEquipmentSlot
+* @brief 장비 컴포넌트의 장비 슬롯 ENUM
+*/
+UENUM(BlueprintType)
+enum class EEquipmentSlot : uint8
+{
+	/** @brief 장착 슬롯 : 무기 */
+	Weapon		UMETA(DisplayName = "장착 슬롯 : 무기"),
+	/** @brief 장착 슬롯 : 투구 */
+	Helmet		UMETA(DisplayName = "장착 슬롯 : 투구"),
+	/** @brief 장착 슬롯 : 갑옷 */
+	Chest		UMETA(DisplayName = "장착 슬롯 : 갑옷"),
+	/** @brief 장착 슬롯 : 장갑 */
+	Gloves		UMETA(DisplayName = "장착 슬롯 : 장갑"),
+	/** @brief 장착 슬롯 : 신발 */
+	Boots		UMETA(DisplayName = "장착 슬롯 : 신발"),
+	/** @brief 장착 슬롯 : 없음 */
+	None		UMETA(DisplayName = "장착 슬롯 : 없음")
+
+};
+>>>>>>> middle
