@@ -14,6 +14,8 @@ class UCharacterStatusWidget;
 class UGameTimerWidget;
 class UVirtualJoystickWidget;
 class UResultPopupWidget;
+class UVictoryPopupWidget;
+class UDefeatPopupWidget;
 class UParadiseCommonButton;
 class AInGameGameState;
 #pragma endregion 전방 선언
@@ -43,6 +45,10 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Paradise|UI")
 	void InitializeHUD();
+
+private:
+	/** @brief GameState를 안전하게 캐싱하여 매 프레임 Cast 비용을 절약합니다. */
+	TWeakObjectPtr<AInGameGameState> CachedGameState = nullptr;
 #pragma endregion 초기화
 
 #pragma region 하위 패널 접근 (Getters)
@@ -63,8 +69,8 @@ private:
 	 * @brief GameState의 Phase가 변경되었을 때 호출됩니다. (Delegate 바인딩)
 	 * @param NewPhase 변경된 게임 단계
 	 */
-	/*UFUNCTION()
-	void HandleGamePhaseChanged(EGamePhase NewPhase);*/
+	UFUNCTION()
+	void HandleGamePhaseChanged(EGamePhase NewPhase);
 
 	/** @brief 설정 버튼 클릭 처리 */
 	UFUNCTION()
@@ -111,6 +117,14 @@ private:
 	/** @brief 우측 상단 설정 버튼 (CommonBtn) */
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UParadiseCommonButton> Btn_Setting = nullptr;
+
+	/** @brief 승리 시 표시될 팝업 */
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UVictoryPopupWidget> Widget_VictoryPopup = nullptr;
+
+	/** @brief 패배 시 표시될 팝업 */
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UDefeatPopupWidget> Widget_DefeatPopup = nullptr;
 #pragma endregion 위젯 바인딩
 
 #pragma region 내부 데이터
