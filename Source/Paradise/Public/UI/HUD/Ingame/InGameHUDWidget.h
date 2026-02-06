@@ -63,8 +63,8 @@ private:
 	 * @brief GameState의 Phase가 변경되었을 때 호출됩니다. (Delegate 바인딩)
 	 * @param NewPhase 변경된 게임 단계
 	 */
-	UFUNCTION()
-	void HandleGamePhaseChanged(EGamePhase NewPhase);
+	/*UFUNCTION()
+	void HandleGamePhaseChanged(EGamePhase NewPhase);*/
 
 	/** @brief 설정 버튼 클릭 처리 */
 	UFUNCTION()
@@ -111,13 +111,6 @@ private:
 	/** @brief 우측 상단 설정 버튼 (CommonBtn) */
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UParadiseCommonButton> Btn_Setting = nullptr;
-
-	/** 
-	 * @brief 게임 종료 시 표시될 승리/패배 결과 팝업
-	 * @details Z-Order가 가장 높아야 하며, 평소에는 Hidden 상태입니다.
-	 */
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UResultPopupWidget> Widget_ResultPopup = nullptr;
 #pragma endregion 위젯 바인딩
 
 #pragma region 내부 데이터

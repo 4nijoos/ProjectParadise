@@ -10,7 +10,6 @@
 #include "UI/Panel/Ingame/SummonControlPanel.h"
 #include "UI/Widgets/Ingame/CharacterStatusWidget.h"
 #include "UI/Widgets/Ingame/GameTimerWidget.h"
-#include "UI/Widgets/Ingame/Popup/ResultPopupWidget.h"
 #include "Framework/InGame/InGameGameState.h"
 
 #include "Kismet/GameplayStatics.h"
@@ -42,11 +41,11 @@ void UInGameHUDWidget::NativeConstruct()
 		VirtualJoystick->OnJoystickInput.AddDynamic(this, &UInGameHUDWidget::OnJoystickInput);
 	}
 
-	// 결과 팝업 초기화 (숨김)
-	if (Widget_ResultPopup)
-	{
-		Widget_ResultPopup->SetVisibility(ESlateVisibility::Collapsed);
-	}
+	//// 결과 팝업 초기화 (숨김)
+	//if (Widget_ResultPopup)
+	//{
+	//	Widget_ResultPopup->SetVisibility(ESlateVisibility::Collapsed);
+	//}
 
 	// GameState 연결 및 델리게이트 구독
 	InitializeHUD();
@@ -85,47 +84,47 @@ void UInGameHUDWidget::NativeDestruct()
 
 void UInGameHUDWidget::InitializeHUD()
 {
-	UE_LOG(LogTemp, Log, TEXT("InGameHUD 초기화"));
+	//UE_LOG(LogTemp, Log, TEXT("InGameHUD 초기화"));
 
-	AInGameGameState* GS = Cast<AInGameGameState>(UGameplayStatics::GetGameState(this));
-	if (GS)
-	{
-		// 페이즈 변경 이벤트 바인딩
-		GS->OnGamePhaseChanged.AddUniqueDynamic(this, &UInGameHUDWidget::HandleGamePhaseChanged);
+	//AInGameGameState* GS = Cast<AInGameGameState>(UGameplayStatics::GetGameState(this));
+	//if (GS)
+	//{
+	//	// 페이즈 변경 이벤트 바인딩
+	//	GS->OnGamePhaseChanged.AddUniqueDynamic(this, &UInGameHUDWidget::HandleGamePhaseChanged);
 
-		// 현재 상태 즉시 반영 (이미 게임 중일 수 있음)
-		HandleGamePhaseChanged(GS->CurrentPhase);
-	}
+	//	// 현재 상태 즉시 반영 (이미 게임 중일 수 있음)
+	//	HandleGamePhaseChanged(GS->CurrentPhase);
+	//}
 }
 
-void UInGameHUDWidget::HandleGamePhaseChanged(EGamePhase NewPhase)
-{
-	UE_LOG(LogTemp, Log, TEXT("[InGameHUD] 페이즈 변경 감지: %d"), (int32)NewPhase);
-
-	switch (NewPhase)
-	{
-	case EGamePhase::Victory:
-	case EGamePhase::Defeat:
-		// 결과창 표시
-		if (Widget_ResultPopup)
-		{
-			AInGameGameState* GS = Cast<AInGameGameState>(UGameplayStatics::GetGameState(this));
-			if (GS)
-			{
-				bool bIsWin = (NewPhase == EGamePhase::Victory);
-				Widget_ResultPopup->SetResultData(bIsWin, GS->AcquiredGold, GS->AcquiredExp);
-				Widget_ResultPopup->SetVisibility(ESlateVisibility::Visible);
-
-				// 팝업이 뜨면 조이스틱 입력 막기 등 처리 가능
-				if (VirtualJoystick) VirtualJoystick->SetVisibility(ESlateVisibility::HitTestInvisible);
-			}
-		}
-		break;
-
-	default:
-		break;
-	}
-}
+//void UInGameHUDWidget::HandleGamePhaseChanged(EGamePhase NewPhase)
+//{
+//	UE_LOG(LogTemp, Log, TEXT("[InGameHUD] 페이즈 변경 감지: %d"), (int32)NewPhase);
+//
+//	switch (NewPhase)
+//	{
+//	case EGamePhase::Victory:
+//	case EGamePhase::Defeat:
+//		// 결과창 표시
+//		if (Widget_ResultPopup)
+//		{
+//			AInGameGameState* GS = Cast<AInGameGameState>(UGameplayStatics::GetGameState(this));
+//			if (GS)
+//			{
+//				bool bIsWin = (NewPhase == EGamePhase::Victory);
+//				Widget_ResultPopup->SetResultData(bIsWin, GS->AcquiredGold, GS->AcquiredExp);
+//				Widget_ResultPopup->SetVisibility(ESlateVisibility::Visible);
+//
+//				// 팝업이 뜨면 조이스틱 입력 막기 등 처리 가능
+//				if (VirtualJoystick) VirtualJoystick->SetVisibility(ESlateVisibility::HitTestInvisible);
+//			}
+//		}
+//		break;
+//
+//	default:
+//		break;
+//	}
+//}
 
 void UInGameHUDWidget::OnSettingButtonClicked()
 {
