@@ -4,6 +4,7 @@
 #include "Components/InventoryComponent.h"
 #include "Data/Structs/ItemStructs.h"
 #include "Data/Structs/UnitStructs.h"
+#include "Data/Structs/InventoryStruct.h"
 #include "Framework/Core/ParadiseGameInstance.h"
 
 // Sets default values for this component's properties
@@ -107,6 +108,7 @@ void UInventoryComponent::AddItem(FName ItemID, int32 Count)
 	{
 		if (OwnedItems[i].ItemID == ItemID)
 		{
+			OwnedItems[i].Quantity += Count;
 			//이미 있는 아이템 //수량변동 //강화수치비교필요
 			return;
 		}
@@ -115,7 +117,7 @@ void UInventoryComponent::AddItem(FName ItemID, int32 Count)
 	FOwnedItemData NewItem;
 	NewItem.ItemID = ItemID;
 	NewItem.EnhancementLevel = 1;
-	NewItem.Quantity = 1;
+	NewItem.Quantity = Count;
 
 	OwnedItems.Add(NewItem);
 
@@ -199,6 +201,60 @@ void UInventoryComponent::AddFamiliar(FName FamiliarID)
 	{
 		OnInventoryUpdated.Broadcast();
 	}
+}
+
+void UInventoryComponent::Debug_TestInventory()
+{
+	UE_LOG(LogTemp, Warning, TEXT("=========================================="));
+	UE_LOG(LogTemp, Warning, TEXT("🧪 [Debug] 인벤토리 테스트 시작"));
+	UE_LOG(LogTemp, Warning, TEXT("=========================================="));
+
+	// 1. 테스트 데이터 추가 시도 (데이터 테이블에 실제 존재하는 ID를 넣어야 합니다!)
+	// 예시 ID를 사용했으니, 본인 프로젝트 테이블에 있는 ID로 바꿔주세요.
+	AddCharacter(FName("Character_Knight"));       // 성공 예상
+	AddCharacter(FName("Character_Knight"));       // 중복 실패 예상 (이미 보유)
+
+	AddFamiliar(FName("Fam_Skeleton"));
+	AddFamiliar(FName("Fam_Skeleton")); 
+
+	AddItem(FName("W_BasicSword"), 1);
+	AddItem(FName("A_WoodHelmet"), 10);
+
+	// 2. 전체 리스트 출력
+	UE_LOG(LogTemp, Log, TEXT(" "));
+	UE_LOG(LogTemp, Log, TEXT("📂 [인벤토리 현황 리포트]"));
+
+	// [영웅 목록]
+	UE_LOG(LogTemp, Log, TEXT("------------------------------------------"));
+	UE_LOG(LogTemp, Log, TEXT("1. 보유 영웅 (총 %d명)"), OwnedCharacters.Num());
+	for (int32 i = 0; i < OwnedCharacters.Num(); ++i)
+	{
+		const auto& Data = OwnedCharacters[i];
+		UE_LOG(LogTemp, Log, TEXT("   [%d] ID: %-15s | Lv: %d | Awa: %d"),
+			i, *Data.CharacterID.ToString(), Data.Level, Data.AwakeningLevel);
+	}
+
+	// [퍼밀리어 목록]
+	UE_LOG(LogTemp, Log, TEXT("------------------------------------------"));
+	UE_LOG(LogTemp, Log, TEXT("2. 보유 퍼밀리어 (총 %d종)"), OwnedFamiliars.Num());
+	for (int32 i = 0; i < OwnedFamiliars.Num(); ++i)
+	{
+		const auto& Data = OwnedFamiliars[i];
+		UE_LOG(LogTemp, Log, TEXT("   [%d] ID: %-15s | Lv: %d | Qty: %d"),
+			i, *Data.FamiliarID.ToString(), Data.Level, Data.Quantity);
+	}
+
+	// [아이템 목록]
+	UE_LOG(LogTemp, Log, TEXT("------------------------------------------"));
+	UE_LOG(LogTemp, Log, TEXT("3. 보유 아이템 (총 %d종)"), OwnedItems.Num());
+	for (int32 i = 0; i < OwnedItems.Num(); ++i)
+	{
+		const auto& Data = OwnedItems[i];
+		UE_LOG(LogTemp, Log, TEXT("   [%d] ID: %-15s | Qty: %d | Reinforce: +%d"),
+			i, *Data.ItemID.ToString(), Data.Quantity, Data.EnhancementLevel);
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("=========================================="));
 }
 
 bool UInventoryComponent::RemoveItem(FName ItemID, int32 Count)
