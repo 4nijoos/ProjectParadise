@@ -74,8 +74,12 @@ public:
 
 protected:
 	/** @brief 최대 코스트 보유량 (기본값: 100) */
-	UPROPERTY(EditDefaultsOnly, Category = "Economy")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Economy")
 	float MaxCost = 100.0f;
+
+	/** * @brief 현재 보유 코스트*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Economy")
+	float CurrentCost = 0.0f;
 
 	/** @brief 초당 코스트 회복량 (기본값: 10) */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Economy")
@@ -84,9 +88,4 @@ protected:
 	/** @brief 회복 활성화 여부 스위치 */
 	UPROPERTY(EditDefaultsOnly, Category = "Economy")
 	bool bIsRegenActive = false;
-
-	/** * @brief 현재 보유 코스트*/
-	UPROPERTY(VisibleAnywhere, Category = "Economy")
-	float CurrentCost = 0.0f;
-		
 };

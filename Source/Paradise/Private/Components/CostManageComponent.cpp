@@ -11,7 +11,7 @@ UCostManageComponent::UCostManageComponent()
 	//기본값 초기화
 	MaxCost = 100.0f;
 	CostRegenRate = 10.0f;
-	CurrentCost = 0.0f;
+	CurrentCost = 100.0f;
 	bIsRegenActive = false;	//게임 시작 전에는 멈춰둠
 }
 
@@ -43,7 +43,7 @@ void UCostManageComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 		CurrentCost = FMath::Clamp(CurrentCost, 0.0f, MaxCost);
 
 		//디버그용 로그
-		UE_LOG(LogTemp, Warning, TEXT("현재 코스트: %f"), CurrentCost);
+		//UE_LOG(LogTemp, Warning, TEXT("현재 코스트: %f"), CurrentCost);
 
 		//5. 값이 변할 떄마다 UI 갱신을 위해 델리게이트 호출
 		OnCostChanged.Broadcast(CurrentCost, MaxCost);
@@ -53,7 +53,7 @@ void UCostManageComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 void UCostManageComponent::StartCostRegen()
 {
 	bIsRegenActive = true;
-	UE_LOG(LogTemp, Log, TEXT("💰 [CostManager] 코스트 회복 시작!"));
+	//UE_LOG(LogTemp, Log, TEXT("💰 [CostManager] 코스트 회복 시작!"));
 
 }
 
@@ -61,7 +61,7 @@ void UCostManageComponent::StartCostRegen()
 void UCostManageComponent::StopCostRegen()
 {
 	bIsRegenActive = false;
-	UE_LOG(LogTemp, Log, TEXT("💰 [CostManager] 코스트 회복 중지!"));
+	//UE_LOG(LogTemp, Log, TEXT("💰 [CostManager] 코스트 회복 중지!"));
 }
 
 // 코스트 소비 //유닛 소환 시 호출 (나중에 연결)
@@ -76,11 +76,11 @@ bool UCostManageComponent::TrySpendCost(float Amount)
 			OnCostChanged.Broadcast(CurrentCost, MaxCost);
 
 			// 성공 반환
-			UE_LOG(LogTemp, Log, TEXT("✅ [CostManager] 소비 성공: -%.1f (남은 코스트: %.1f)"), Amount, CurrentCost);
+			//UE_LOG(LogTemp, Log, TEXT("✅ [CostManager] 소비 성공: -%.1f (남은 코스트: %.1f)"), Amount, CurrentCost);
 			return true;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("❌ [CostManager] 잔액 부족! (필요: %.1f, 보유: %.1f)"), Amount, CurrentCost);
+	//UE_LOG(LogTemp, Warning, TEXT("❌ [CostManager] 잔액 부족! (필요: %.1f, 보유: %.1f)"), Amount, CurrentCost);
 	return false;
 }
 
