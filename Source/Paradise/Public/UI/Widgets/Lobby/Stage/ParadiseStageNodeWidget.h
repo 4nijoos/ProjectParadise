@@ -30,7 +30,7 @@ protected:
 	/** @brief 데이터가 리스트 뷰로부터 전달될 때 호출되는 인터페이스 함수 */
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 
-#pragma region UI 컴포넌트 (UI Components)
+#pragma region UI 컴포넌트
 protected:
 	/** @brief 스테이지 썸네일 이미지 */
 	UPROPERTY(meta = (BindWidget))
@@ -43,9 +43,9 @@ protected:
 	/** @brief 입장 버튼 (전체 영역 클릭) */
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UButton> Btn_Enter = nullptr;
-#pragma endregion UI 컴포넌트 (UI Components)
+#pragma endregion UI 컴포넌트
 
-#pragma region 내부 로직 (Internal Logic)
+#pragma region 내부 로직
 private:
 	/** @brief 현재 할당된 데이터 객체 캐싱 */
 	UPROPERTY()
@@ -54,6 +54,6 @@ private:
 	/** @brief 버튼 클릭 핸들러 */
 	UFUNCTION()
 	void OnClickEnter();
-#pragma endregion 내부 로직 (Internal Logic)
+#pragma endregion 내부 로직 
 	
 };
