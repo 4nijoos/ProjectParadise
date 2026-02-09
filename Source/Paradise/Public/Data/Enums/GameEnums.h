@@ -83,9 +83,9 @@ enum class ECombatActionType : uint8
 };
 
 /**
-* @enum EEquipmentSlot
-* @brief 장비 컴포넌트의 장비 슬롯 ENUM
-*/
+ * @enum EEquipmentSlot
+ * @brief 장비 컴포넌트의 장비 슬롯 ENUM
+ */
 UENUM(BlueprintType)
 enum class EEquipmentSlot : uint8
 {
