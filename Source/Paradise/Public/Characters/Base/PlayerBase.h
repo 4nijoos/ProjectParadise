@@ -29,12 +29,9 @@ public:
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-<<<<<<< HEAD
 	virtual FCombatActionData GetCombatActionData(ECombatActionType ActionType) const override;
-=======
 	UFUNCTION(BlueprintCallable)
 	class APlayerData* GetPlayerData() const { return LinkedPlayerData.Get(); }
->>>>>>> middle
 
 	/** @brief 캐릭터 사망 여부 반환 (컨트롤러 확인용) */
 	UFUNCTION(BlueprintPure, Category = "Status")
@@ -137,8 +134,5 @@ protected:
 	 */
 	UPROPERTY(EditDefaultsOnly, Category = "Combat")
 	FName WeaponSocketName;
-
-
-	
 
 };
