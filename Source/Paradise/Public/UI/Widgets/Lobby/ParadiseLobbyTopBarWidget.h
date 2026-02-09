@@ -31,7 +31,7 @@ protected:
 
 	/** @brief 에테르(가챠 재화) 표시 텍스트 */
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> Text_EtherAmount = nullptr;
+	TObjectPtr<UTextBlock> Text_AetherAmount = nullptr;
 
 	/** @brief 설정 버튼 */
 	UPROPERTY(meta = (BindWidget))

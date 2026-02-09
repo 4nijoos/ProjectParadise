@@ -22,6 +22,16 @@ class PARADISE_API ALobbyPlayerController : public APlayerController
 	
 protected:
 	virtual void BeginPlay() override;
+
+#pragma region 설정 (Config)
+protected:
+	/** * @brief 로비 화면에 띄울 HUD 위젯 클래스.
+	 * @details BP_LobbyPlayerController에서 WBP_LobbyHUD를 넣어주세요.
+	 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Paradise|UI")
+	TSubclassOf<UParadiseLobbyHUDWidget> LobbyHUDClass;
+#pragma endregion 설정
+
 #pragma region 로직 인터페이스
 public:
 	/**

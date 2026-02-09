@@ -48,9 +48,9 @@ void UParadiseLobbyTopBarWidget::UpdateCurrencyUI(int32 InGold, int32 InEther)
 	}
 
 	// 에테르 텍스트 갱신
-	if (Text_EtherAmount)
+	if (Text_AetherAmount)
 	{
-		Text_EtherAmount->SetText(FText::AsNumber(InEther));
+		Text_AetherAmount->SetText(FText::AsNumber(InEther));
 	}
 }
 
