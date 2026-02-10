@@ -3,6 +3,7 @@
 
 #include "UI/Widgets/Summon/ParadiseSummonPopup.h"
 #include "UI/Panel/Summon/ParadiseSummonPanel.h"
+#include "Framework/Lobby/LobbyPlayerController.h"
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
 
@@ -55,8 +56,12 @@ void UParadiseSummonPopup::OnEquipmentTabClicked()
 
 void UParadiseSummonPopup::OnBackButtonClicked()
 {
-	// 팝업 닫기 (부모 뷰포트나 스택에서 제거)
-	RemoveFromParent();
+	// 내 컨트롤러 찾아서 로비(None)로 돌아가달라고 요청
+	if (ALobbyPlayerController* PC = GetOwningPlayer<ALobbyPlayerController>())
+	{
+		// "None"으로 이동하면 -> 카메라는 Main으로, UI는 로비 메뉴로 복구됨
+		PC->MoveCameraToMenu(EParadiseLobbyMenu::None);
+	}
 	UE_LOG(LogTemp, Log, TEXT("[SummonPopup] 로비로 복귀합니다."));
 }
 
