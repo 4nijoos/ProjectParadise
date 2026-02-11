@@ -5,7 +5,8 @@
 #include "Components/CostManageComponent.h"
 #include "Framework/InGame/InGamePlayerState.h"
 #include "Characters/AIUnit/BaseUnit.h"
-#include "Framework/System/ObjectPoolSubsystem.h"
+#include "Framework/Core/ParadiseGameInstance.h"
+#include "Objects/FamiliarSpawner.h"
 #include "Data/Structs/UnitStructs.h"
 #include "TimerManager.h"
 
@@ -24,23 +25,24 @@ void UFamiliarSummonComponent::BeginPlay()
 
 void UFamiliarSummonComponent::RefreshAllSlots()
 {
-	// 데이터 테이블 유효성 검사
-	if (!FamiliarStatsTable || !FamiliarAssetsTable)
-	{
-		UE_LOG(LogTemp, Error, TEXT("⚠️ [FamiliarSummon] FamiliarStatsTable 또는 FamiliarAssetsTable이 설정되지 않았습니다."));
-		return;
-	}
+	// 1. GameInstance 가져오기
+	UParadiseGameInstance* GI = Cast<UParadiseGameInstance>(GetWorld()->GetGameInstance());
+	if (!GI) return;
 
-	// 배열 초기화
-	CurrentSlots.Empty();
+	// 2. 인스턴스에 선언된 변수명 그대로 사용
+	UDataTable* StatsTable = GI->FamiliarStatsDataTable;
+	UDataTable* AssetsTable = GI->FamiliarAssetsDataTable;
 
+	if (!StatsTable || !AssetsTable) return;
 	UE_LOG(LogTemp, Warning, TEXT("========== 🎰 [상점 리스트 갱신] 🎰 =========="));
 	
+	CurrentSlots.Empty();
+
 	//5개 슬롯을 랜덤 유닛으로 채움
 	for (int32 i = 0; i < MaxSlotCount; i++)
 	{
 		//슬롯하나 생성 
-		FSummonSlotInfo NewSlot = GenerateRandomSlot();
+		FSummonSlotInfo NewSlot = GenerateRandomSlot(StatsTable, AssetsTable);
 		//배열에 추가
 		CurrentSlots.Add(NewSlot);
 
@@ -62,11 +64,11 @@ bool UFamiliarSummonComponent::RequestPurchase(int32 SlotIndex)
 	if (CurrentSlots[SlotIndex].bIsSoldOut)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("빈 슬롯입니다. 쿨타임 대기 중.."))
-		return false;
+			return false;
 	}
 
-	//PlayerState 및 CostManger 가져오기
-	AInGamePlayerState* PS = GetOwner<AInGamePlayerState>();
+		//PlayerState 및 CostManger 가져오기
+		AInGamePlayerState* PS = GetOwner<AInGamePlayerState>();
 	if (!PS) return false;
 
 	UCostManageComponent* CostManager = PS->GetCostManageComponent();
@@ -81,21 +83,26 @@ bool UFamiliarSummonComponent::RequestPurchase(int32 SlotIndex)
 		return false;
 	}
 
-	//FVector SpawnLocation = FVector::ZeroVector;
+	//TArray<AActor*> FoundSpawners;
+	//UGameplayStatics::GetAllActorsOfClass(GetWorld(), AFamiliarSpawner::StaticClass(), FoundSpawners);
 
-	//실제 소환 요청
-	//AFamiliarUnit* NewUnit = SpawnFamiliarUnit(SlotInfo.UnitID, SpawnLocation);
-
-	//if (NewUnit)
+	//if (FoundSpawners.Num() > 0)
 	//{
-		UE_LOG(LogTemp, Log, TEXT("📍 구매 승인 (유닛 스폰 생략)"));
-		//소환 성공 후 슬롯 처리 로직
-		ConsumeSpecificSlot(SlotIndex);
-		return true;
+	//	AFamiliarSpawner* Spawner = Cast<AFamiliarSpawner>(FoundSpawners[0]);
+	//	if (Spawner)
+	//	{
+
+	//		// ★ 인덱스가 아니라 슬롯에 저장된 실제 'ID(이름)'를 넘겨줌 ★
+	//		Spawner->SpawnFamiliarByID(SlotInfo.FamiliarID);
+
+			//소환 성공 후 슬롯 처리 로직
+			ConsumeSpecificSlot(SlotIndex);
+			return true;
+
+	//	}
 	//}
 
-	// 돈은 냈는데 소환 실패? (이런 경우는 거의 없겠지만 안전장치)
-	//UE_LOG(LogTemp, Error, TEXT("❌ 결제는 성공했으나 유닛 소환 실패!"));
+	//UE_LOG(LogTemp, Error, TEXT("❌ 월드에서 AFamiliarSpawner를 찾을 수 없습니다!"));
 	//return false;
 
 }
@@ -136,8 +143,11 @@ void UFamiliarSummonComponent::RefillSpecificSlot(int32 SlotIndex)
 {
 	if (!CurrentSlots.IsValidIndex(SlotIndex)) return;
 
+	UParadiseGameInstance* GI = Cast<UParadiseGameInstance>(GetWorld()->GetGameInstance());
+	if (!GI || !GI->FamiliarStatsDataTable || !GI->FamiliarAssetsDataTable) return;
+
 	// 1. 새로운 랜덤 유닛 생성
-	CurrentSlots[SlotIndex] = GenerateRandomSlot();
+	CurrentSlots[SlotIndex] = GenerateRandomSlot(GI->FamiliarStatsDataTable, GI->FamiliarAssetsDataTable);
 
 	// 2. UI 갱신 알림 (새로 채워진 모습 보여주기)
 	OnSummonSlotsUpdated.Broadcast(CurrentSlots);
@@ -153,35 +163,23 @@ void UFamiliarSummonComponent::RefillSpecificSlot(int32 SlotIndex)
 }
 
 //슬롯을 랜덤으로 for문으로 5번 돌림
-FSummonSlotInfo UFamiliarSummonComponent::GenerateRandomSlot()
+FSummonSlotInfo UFamiliarSummonComponent::GenerateRandomSlot(UDataTable* StatsTable, UDataTable* AssetsTable)
 {
 	FSummonSlotInfo NewSlot;
+	TArray<FName> RowNames = StatsTable->GetRowNames();
 
-	//데이터테이블 체크
-	if (!FamiliarStatsTable) return NewSlot;
-
-	TArray<FName> RowNames = FamiliarStatsTable->GetRowNames();
-	if (RowNames.Num() == 0) return NewSlot;
-
-	//랜덤 유닛 ID 뽑기
 	int32 RandomIndex = FMath::RandRange(0, RowNames.Num() - 1);
 	FName SelectedID = RowNames[RandomIndex];
 
-	//데이터 테이블에서 정보 가져오기
-	FFamiliarStats* Stats = FamiliarStatsTable->FindRow<FFamiliarStats>(SelectedID, TEXT("RandomGen"));
+	FFamiliarStats* Stats = StatsTable->FindRow<FFamiliarStats>(SelectedID, TEXT(""));
+	FFamiliarAssets* Assets = AssetsTable->FindRow<FFamiliarAssets>(SelectedID, TEXT(""));
 
-	if (Stats)
+	if (Stats && Assets)
 	{
 		NewSlot.FamiliarID = SelectedID;
 		NewSlot.FamiliarCost = Stats->SummonCost;
-		// NewSlot.Icon = Stats->Icon
-		NewSlot.bIsSoldOut = false;	//꽉 찼음 
+		//NewSlot.UnitIcon = Assets->UnitIcon; // GameInstance에 있는 테이블 구조에 맞게 가져오기
+		NewSlot.bIsSoldOut = false;
 	}
 	return NewSlot;
 }
-
-//AFamiliarUnit* UFamiliarSummonComponent::SpawnFamiliarUnit(FName UnitID, FVector SpawnLocation)
-//{
-	//오브젝트 풀링으로 소환
-
-//}

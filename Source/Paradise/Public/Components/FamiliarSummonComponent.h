@@ -95,17 +95,9 @@ protected:
 	/** @brief 랜덤 유닛을 하나 생성하여 슬롯 정보를 반환함 
 	* @return 생성된 슬롯 정보 구조체 -> RefreshAllSlots함수에서 반복문으로 배열 생성
 	*/
-	FSummonSlotInfo GenerateRandomSlot();
+	FSummonSlotInfo GenerateRandomSlot(UDataTable* StatsTable, UDataTable* AssetsTable);
 
 protected:
-	/** @brief 퍼밀리어 스탯 데이터 테이블 */
-	UPROPERTY(EditDefaultsOnly, Category = "Config")
-	TObjectPtr<UDataTable> FamiliarStatsTable;
-
-	/** @brief 퍼밀리어 에셋 데이터 테이블 */
-	UPROPERTY(EditDefaultsOnly, Category = "Config")
-	TObjectPtr<UDataTable> FamiliarAssetsTable;
-
 	/** @brief 소환할 퍼밀리어 클래스 (BP_FamiliarUnit) */
 	//UPROPERTY(EditDefaultsOnly, Category = "Config")
 	//TSubclassOf<class AFamiliarUnit> FamiliarClass;
