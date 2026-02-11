@@ -7,6 +7,7 @@
 #include "Components/InventoryComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Framework/System/ParadiseSaveGame.h"
 #include "AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Framework/InGame/InGameController.h"
@@ -16,6 +17,7 @@
 #include "Data/Enums/GameEnums.h"
 #include "Framework/Core/ParadiseGameInstance.h"
 #include "Data/Structs/ItemStructs.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h" // 트레이스 함수용
 #include "AbilitySystemBlueprintLibrary.h" // GAS 이벤트 전송용
 
@@ -192,138 +194,6 @@ void APlayerBase::CheckHit()
 
     }
 }
-
-void APlayerBase::Debug_TestEquipmentFlow()
-{
-    UParadiseGameInstance* GI = Cast<UParadiseGameInstance>(GetGameInstance());
-    if (!GI || !GI->GetMainInventory() || !LinkedPlayerData.IsValid())
-    {
-        UE_LOG(LogTemp, Error, TEXT("❌ [Debug] GI, 인벤토리, 또는 PlayerData가 유효하지 않습니다."));
-        return;
-    }
-
-    UInventoryComponent* MainInv = GI->GetMainInventory();
-
-    FName TestWeaponID = FName("Iron_Sword");
-
-    // 1. [아이템 획득]
-    MainInv->AddItem(TestWeaponID, 1, 0);
-    UE_LOG(LogTemp, Warning, TEXT("[Debug: 1/5] 인벤토리에 '%s' 추가 완료"), *TestWeaponID.ToString());
-
-    // 2. 추가된 아이템의 고유 ID 찾기
-    FGuid TargetItemUID;
-    const TArray<FOwnedItemData>& Items = MainInv->GetOwnedItems();
-    for (int32 i = Items.Num() - 1; i >= 0; --i)
-    {
-        if (Items[i].ItemID == TestWeaponID)
-        {
-            TargetItemUID = Items[i].ItemUID;
-            break;
-        }
-    }
-
-    if (!TargetItemUID.IsValid())
-    {
-        UE_LOG(LogTemp, Error, TEXT("❌ [Debug] 방금 추가한 아이템의 UID를 찾을 수 없습니다!"));
-        return;
-    }
-
-    // 3. 내 캐릭터의 고유 ID 찾기 (방법 1로 Name 변수를 만드셨다면 CharacterID 사용)
-    FName MyHeroID = LinkedPlayerData->CharacterID;
-    // 만약 태그 방식을 쓰셨다면 아래 주석을 해제하고 위 줄을 지우세요.
-    // FName MyHeroID = (LinkedPlayerData->Tags.Num() > 0) ? LinkedPlayerData->Tags[0] : NAME_None;
-
-    FGuid MyCharUID;
-    for (const FOwnedCharacterData& CharData : MainInv->GetOwnedCharacters())
-    {
-        if (CharData.CharacterID == MyHeroID)
-        {
-            MyCharUID = CharData.CharacterUID;
-            break;
-        }
-    }
-
-    // ★ [신규 추가] 인벤토리에 내 영웅이 없다면? 디버그를 위해 강제 추가!
-    if (!MyCharUID.IsValid())
-    {
-        UE_LOG(LogTemp, Warning, TEXT("⚠️ [Debug] 인벤토리에 '%s' 데이터가 없어 임시로 추가합니다."), *MyHeroID.ToString());
-        MainInv->AddCharacter(MyHeroID); // 영웅 영입 함수 호출
-
-        // 다시 UID 검색
-        for (const FOwnedCharacterData& CharData : MainInv->GetOwnedCharacters())
-        {
-            if (CharData.CharacterID == MyHeroID)
-            {
-                MyCharUID = CharData.CharacterUID;
-                break;
-            }
-        }
-
-        // 그래도 없다면 데이터 테이블 이름이 틀린 것
-        if (!MyCharUID.IsValid())
-        {
-            UE_LOG(LogTemp, Error, TEXT("❌ [Debug] 영웅 추가 후에도 UID를 찾지 못했습니다. 데이터 테이블 ID를 확인하세요."));
-            return;
-        }
-    }
-
-    // 4. [장비 장착]
-    MainInv->EquipItemToCharacter(MyCharUID, TargetItemUID);
-    UE_LOG(LogTemp, Warning, TEXT("[Debug: 2/5] 데이터 장착 완료. 비주얼을 갱신합니다."));
-
-    // 5. [비주얼 갱신]
-    if (UEquipmentComponent* EquipComp = LinkedPlayerData->GetEquipmentComponent())
-    {
-        for (const FOwnedCharacterData& CharData : MainInv->GetOwnedCharacters())
-        {
-            if (CharData.CharacterUID == MyCharUID)
-            {
-                EquipComp->InitializeEquipment(CharData.EquipmentMap, MainInv);
-                break;
-            }
-        }
-    }
-
-    // 6. [타이머 가동]
-    FTimerHandle DebugTimerHandle;
-    FTimerDelegate TimerDel;
-    TimerDel.BindUObject(this, &APlayerBase::Debug_UnequipAndRemoveItem, TargetItemUID, MyCharUID);
-
-    GetWorld()->GetTimerManager().SetTimer(DebugTimerHandle, TimerDel, 5.0f, false);
-    UE_LOG(LogTemp, Warning, TEXT("[Debug: 3/5] 장착 완료! 5초 뒤 자동 해제 및 삭제를 시작합니다..."));
-}
-void APlayerBase::Debug_UnequipAndRemoveItem(FGuid TargetItemUID, FGuid TargetCharUID)
-{
-    UParadiseGameInstance* GI = Cast<UParadiseGameInstance>(GetGameInstance());
-    if (!GI || !GI->GetMainInventory() || !LinkedPlayerData.IsValid()) return;
-
-    UInventoryComponent* MainInv = GI->GetMainInventory();
-
-    // 1. [장비 해제] 데이터 장착 해제 (무기 슬롯이라고 가정)
-    MainInv->UnEquipItemFromCharacter(TargetCharUID, EEquipmentSlot::Weapon);
-    UE_LOG(LogTemp, Warning, TEXT("[Debug: 4/5] 장비 해제 완료. 비주얼을 원래대로 되돌립니다."));
-
-    // 2. [비주얼 갱신] 텅 빈 장착 맵을 다시 덮어씌워 칼을 손에서 없앰
-    if (UEquipmentComponent* EquipComp = LinkedPlayerData->GetEquipmentComponent())
-    {
-        for (const FOwnedCharacterData& CharData : MainInv->GetOwnedCharacters())
-        {
-            if (CharData.CharacterUID == TargetCharUID)
-            {
-                EquipComp->InitializeEquipment(CharData.EquipmentMap, MainInv);
-                break;
-            }
-        }
-    }
-
-    // 3. [인벤토리 삭제] 장착 해제된 무기를 인벤토리에서 영구 삭제
-    bool bRemoved = MainInv->RemoveObjectByGUID(TargetItemUID, 1);
-    if (bRemoved)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("[Debug: 5/5] 인벤토리에서 아이템 영구 삭제 완료! 테스트가 종료되었습니다."));
-    }
-}
-
 
 UAbilitySystemComponent* APlayerBase::GetAbilitySystemComponent() const
 {

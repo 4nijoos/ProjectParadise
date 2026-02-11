@@ -32,6 +32,10 @@ public:
 
 public:
 
+	//세이브 슬롯 이름 (기본: "SaveSlot_01")
+	UPROPERTY(VisibleAnywhere, Category = "Basic")
+	FString SaveGameSlotName;
+
 	UFUNCTION(BlueprintCallable, Category = "SaveSystem")
 	void SaveGameData();
 

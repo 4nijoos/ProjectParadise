@@ -97,18 +97,6 @@ public:
 	 */
 	void CheckHit();
 
-#pragma region 디버그
-public:
-	/** * @brief [Debug] 장비 획득 -> 장착 -> 5초 대기 -> 해제 -> 인벤 삭제 풀 사이클 테스트
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Debug")
-	void Debug_TestEquipmentFlow();
-
-private:
-	/** @brief 5초 뒤 실행될 타이머 콜백 함수 (UFUNCTION 필요 없음) */
-	void Debug_UnequipAndRemoveItem(FGuid TargetItemUID, FGuid TargetCharUID);
-
-#pragma endregion 디버그
 protected:
 
 	/*
