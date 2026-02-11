@@ -15,7 +15,7 @@ class UParadiseItemSlot;
 #pragma endregion 전방 선언
 
 /** @brief 아이템 클릭 시 메인 위젯으로 알림 */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSquadItemClicked, const FSquadItemUIData&, ItemData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSquadItemClicked, FSquadItemUIData, ItemData);
 
 /**
  * @class UParadiseSquadInventoryWidget
