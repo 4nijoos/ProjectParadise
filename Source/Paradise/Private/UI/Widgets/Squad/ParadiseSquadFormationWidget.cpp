@@ -11,14 +11,14 @@ void UParadiseSquadFormationWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	// 슬롯 초기화 및 클릭 이벤트 바인딩 람다 함수
-	auto InitAndBindSlot = [&](UParadiseSquadSlot* Slot, int32 Index)
+	auto InitAndBindSlot = [&](UParadiseSquadSlot* InSlot, int32 Index)
 		{
-			if (Slot)
+			if (InSlot)
 			{
-				Slot->InitSlot(Index);
-				if (!Slot->OnSlotClicked.IsAlreadyBound(this, &UParadiseSquadFormationWidget::HandleSlotClick))
+				InSlot->InitSlot(Index);
+				if (!InSlot->OnSlotClicked.IsAlreadyBound(this, &UParadiseSquadFormationWidget::HandleSlotClick))
 				{
-					Slot->OnSlotClicked.AddDynamic(this, &UParadiseSquadFormationWidget::HandleSlotClick);
+					InSlot->OnSlotClicked.AddDynamic(this, &UParadiseSquadFormationWidget::HandleSlotClick);
 				}
 			}
 		};
