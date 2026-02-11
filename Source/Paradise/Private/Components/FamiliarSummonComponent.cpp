@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Components/SummonSystemComponent.h"
+#include "Components/FamiliarSummonComponent.h"
 #include "Components/CostManageComponent.h"
 #include "Framework/InGame/InGamePlayerState.h"
 #include "Characters/AIUnit/BaseUnit.h"
@@ -9,13 +9,13 @@
 #include "Data/Structs/UnitStructs.h"
 #include "TimerManager.h"
 
-USummonSystemComponent::USummonSystemComponent()
+UFamiliarSummonComponent::UFamiliarSummonComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
 
-void USummonSystemComponent::BeginPlay()
+void UFamiliarSummonComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -23,12 +23,12 @@ void USummonSystemComponent::BeginPlay()
 	RefreshAllSlots();
 }
 
-void USummonSystemComponent::RefreshAllSlots()
+void UFamiliarSummonComponent::RefreshAllSlots()
 {
 	// 데이터 테이블 유효성 검사
 	if (!FamiliarStatsTable || !FamiliarAssetsTable)
 	{
-		UE_LOG(LogTemp, Error, TEXT("⚠️ [SummonSystem] FamiliarStatsTable 또는 FamiliarAssetsTable이 설정되지 않았습니다."));
+		UE_LOG(LogTemp, Error, TEXT("⚠️ [FamiliarSummon] FamiliarStatsTable 또는 FamiliarAssetsTable이 설정되지 않았습니다."));
 		return;
 	}
 
@@ -48,7 +48,7 @@ void USummonSystemComponent::RefreshAllSlots()
 	}
 }
 
-bool USummonSystemComponent::TrySummonFamiliar(int32 SlotIndex, FVector SpawnLocation)
+bool UFamiliarSummonComponent::TrySummonFamiliar(int32 SlotIndex, FVector SpawnLocation)
 {
 	//슬롯 유효성 검사
 	if (!CurrentSlots.IsValidIndex(SlotIndex)) return false;
@@ -91,7 +91,7 @@ bool USummonSystemComponent::TrySummonFamiliar(int32 SlotIndex, FVector SpawnLoc
 
 }
 
-//AFamiliarUnit* USummonSystemComponent::SpawnFamiliarUnit(FName UnitID, FVector SpawnLocation)
+//AFamiliarUnit* UFamiliarSummonComponent::SpawnFamiliarUnit(FName UnitID, FVector SpawnLocation)
 //{
 	//오브젝트 풀링으로 소환
 	//UObjectPoolSubsystem* PoolSubsystem = GetWorld()->GetSubsystem<UObjectPoolSubsystem>();
@@ -116,7 +116,7 @@ bool USummonSystemComponent::TrySummonFamiliar(int32 SlotIndex, FVector SpawnLoc
 	//return nullptr;
 //}
 
-void USummonSystemComponent::HandleSuccessfulSummon(int32 SlotIndex)
+void UFamiliarSummonComponent::HandleSuccessfulSummon(int32 SlotIndex)
 {
 	if (!CurrentSlots.IsValidIndex(SlotIndex)) return;
 
@@ -145,7 +145,7 @@ void USummonSystemComponent::HandleSuccessfulSummon(int32 SlotIndex)
 
 }
 
-void USummonSystemComponent::RefillSpecificSlot(int32 SlotIndex)
+void UFamiliarSummonComponent::RefillSpecificSlot(int32 SlotIndex)
 {
 	if (!CurrentSlots.IsValidIndex(SlotIndex)) return;
 
@@ -159,7 +159,7 @@ void USummonSystemComponent::RefillSpecificSlot(int32 SlotIndex)
 }
 
 //슬롯을 랜덤으로 for문으로 5번 돌림
-FSummonSlotInfo USummonSystemComponent::GenerateRandomSlot()
+FSummonSlotInfo UFamiliarSummonComponent::GenerateRandomSlot()
 {
 	FSummonSlotInfo NewSlot;
 

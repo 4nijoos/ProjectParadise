@@ -6,6 +6,7 @@
 #include "Components/InventoryComponent.h"
 #include "Components/EquipmentComponent.h"
 #include "Components/CostManageComponent.h"
+#include "Components/FamiliarSummonComponent.h"
 #include "Framework/Core/ParadiseGameInstance.h"
 #include "Characters/Player/PlayerData.h"
 
@@ -13,6 +14,7 @@ AInGamePlayerState::AInGamePlayerState()
 {
     InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
     CostManageComponent = CreateDefaultSubobject<UCostManageComponent>(TEXT("CostManageComponent"));
+    FamiliarSummonComponent = CreateDefaultSubobject<UFamiliarSummonComponent>(TEXT("FamiliarSummonComponent"));
 }
 
 void AInGamePlayerState::BeginPlay()

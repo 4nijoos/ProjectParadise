@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Data/Structs/UnitStructs.h"
-#include "SummonSystemComponent.generated.h"
+#include "FamiliarSummonComponent.generated.h"
 
 class UCostManageComponent;
 class UObjectPoolSubsystem;
@@ -36,7 +36,7 @@ struct FSummonSlotInfo
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSummonSlotsUpdated, const TArray<FSummonSlotInfo>&, Slots);
 
 /**
- * @class USummonSystemComponent
+ * @class UFamiliarSummonComponent
  * @brief 유닛 소환 시스템을 관리하는 컴포넌트
  * @details
  * - 5개의 랜덤 유닛 슬롯을 관리.
@@ -45,12 +45,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSummonSlotsUpdated, const TArray<
  * - CostManageComponent와 연동하여 유닛 소환 시 코스트 차감 및 잔액 확인.
  */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class PARADISE_API USummonSystemComponent : public UActorComponent
+class PARADISE_API UFamiliarSummonComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
-	USummonSystemComponent();
+	UFamiliarSummonComponent();
 
 protected:
 	virtual void BeginPlay() override;
