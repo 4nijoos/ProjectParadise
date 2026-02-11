@@ -19,6 +19,13 @@ void UParadiseGameInstance::Init()
 {
 	Super::Init();
 
+	//메인 인벤토리가 없으면 새로 생성 
+	if (!MainInventory)
+	{
+		MainInventory = NewObject<UInventoryComponent>(this, TEXT("MainInventory"));
+		//UE_LOG(LogTemp, Log, TEXT("✅ [GameInstance] 메인 인벤토리 생성 완료"));
+	}
+
 	// [핵심] 서브시스템에 로딩 위젯 클래스 전달
 	if (ULevelLoadingSubsystem* LoadingSystem = GetSubsystem<ULevelLoadingSubsystem>())
 	{

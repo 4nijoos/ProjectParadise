@@ -15,8 +15,6 @@ UEquipmentComponent::UEquipmentComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
-
-	// ...
 }
 
 void UEquipmentComponent::SetLinkedInventory(UInventoryComponent* InInventory)
@@ -28,13 +26,29 @@ void UEquipmentComponent::SetLinkedInventory(UInventoryComponent* InInventory)
     }
 }
 
-// Called when the game starts
-void UEquipmentComponent::BeginPlay()
+void UEquipmentComponent::InitializeEquipment(const TMap<EEquipmentSlot, FGuid>& InEquipmentMap, UInventoryComponent* InInventory)
 {
-	Super::BeginPlay();
+	if (!InInventory)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("⚠️ [Equipment] 인벤토리 참조가 유효하지 않아 장비를 초기화할 수 없습니다."));
+		return;
+	}
 
-	// ...
+	//GameInstance가 건네준 최신 장비 데이터(맵)로 내 캐시를 덮어씌움
+	EquippedItems = InEquipmentMap;
 
+	//외형 업데이트 실행
+	//EquipmentComponent가 현재 Avatar를 찾아 갱신
+	if (APlayerData* Soul = Cast<APlayerData>(GetOwner()))
+	{
+		if (Soul->CurrentAvatar.IsValid())
+		{
+			if (APlayerBase* Avatar = Cast<APlayerBase>(Soul->CurrentAvatar.Get()))
+			{
+				UpdateVisuals(Avatar);
+			}
+		}
+	}
 }
 
 FName UEquipmentComponent::GetEquippedItemID(EEquipmentSlot Slot) const

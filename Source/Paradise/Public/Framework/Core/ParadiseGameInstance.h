@@ -10,7 +10,8 @@
 #include "ParadiseGameInstance.generated.h"
 
 #pragma region 전방 선언
-class ULoadingWidget;
+class ULoadingWidget; 
+class UInventoryComponent;
 #pragma endregion 전방 선언
 
 /**
@@ -26,6 +27,7 @@ class PARADISE_API UParadiseGameInstance : public UGameInstance
 public:
 	UParadiseGameInstance();
 	virtual void Init() override;
+
 #pragma region 게임 데이터 저장 및 로드
 
 public:
@@ -141,9 +143,30 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Squad|Stage", meta = (RowType = "StageWaveDetail", RequiredAssetDataTags = "RowStructure=/Script/Paradise.StageWaveDetail"))
 	TObjectPtr<class UDataTable> StageWaveDetailDataTable = nullptr;
 
+public:
+
+#pragma region 인벤토리 
+
+	/**
+	 * @brief 전역 인벤토리 컴포넌트
+	 * @details 영구적으로 관리합니다.
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Global Data")
+	TObjectPtr<UInventoryComponent> MainInventory;
+
+	/**
+	 * @brief 인벤토리 접근자
+	 */
+	UFUNCTION(BlueprintPure, Category = "Global Data")
+	UInventoryComponent* GetMainInventory() const { return MainInventory; }
+
+#pragma endregion 인벤토리
+
 private:
 
 #pragma endregion 데이터 테이블
+
+
 
 #pragma region 게임 데이터
 public:

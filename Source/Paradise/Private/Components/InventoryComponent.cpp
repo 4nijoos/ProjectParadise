@@ -308,7 +308,11 @@ bool UInventoryComponent::HasCharacter(FName CharacterID) const
 
 UParadiseGameInstance* UInventoryComponent::GetParadiseGI() const
 {
-	return Cast<UParadiseGameInstance>(GetWorld()->GetGameInstance());
+	if (UParadiseGameInstance* GI = Cast<UParadiseGameInstance>(GetOuter()))
+	{
+		return GI;
+	}
+	return nullptr;
 }
 
 
@@ -316,7 +320,7 @@ EEquipmentSlot UInventoryComponent::FindEquipmentSlot(FName ItemID) const
 {
 	if (ItemID.IsNone()) return EEquipmentSlot::Unknown;
 
-	UParadiseGameInstance* GI = Cast<UParadiseGameInstance>(GetWorld()->GetGameInstance());
+	UParadiseGameInstance* GI = GetParadiseGI();
 	if (!GI) return EEquipmentSlot::Unknown;
 
 	//무기 테이블 확인

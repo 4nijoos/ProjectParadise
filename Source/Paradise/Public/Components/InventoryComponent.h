@@ -110,7 +110,7 @@ public:
 
 	/** @return 현재 보유 중인 모든 영웅 목록 (const 참조) */
 	UFUNCTION(BlueprintPure, Category = "Inventory|Query")
-	const TArray<FOwnedCharacterData>& GetOwnedHeroes() const { return OwnedCharacters; }
+	const TArray<FOwnedCharacterData>& GetOwnedCharacters() const { return OwnedCharacters; }
 
 	/** @return 현재 보유 중인 모든 퍼밀리어 목록 (const 참조) */
 	UFUNCTION(BlueprintPure, Category = "Inventory|Query")
