@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -16,32 +16,32 @@ struct FSummonSlotInfo
 {
 	GENERATED_BODY()
 
-	/** @brief µ¥ÀÌÅÍ Å×ÀÌºí Çà ÀÌ¸§ (À¯´Ö ID) */
+	/** @brief ë°ì´í„° í…Œì´ë¸” í–‰ ì´ë¦„ (ìœ ë‹› ID) */
 	UPROPERTY(BlueprintReadOnly, Category = "Summon")
 	FName FamiliarID;
 
-	/** @brief ¼ÒÈ¯¿¡ Ã¥Á¤µÈ °¡°İ */
+	/** @brief ì†Œí™˜ì— ì±…ì •ëœ ê°€ê²© */
 	UPROPERTY(BlueprintReadOnly, Category = "Summon")
 	int32 FamiliarCost;
 
-	/** @brief UI ¾ÆÀÌÄÜ (Assets Å×ÀÌºí¿¡¼­ ·ÎµåÇØ¼­ UI¿¡ Àü´Ş) */
+	/** @brief UI ì•„ì´ì½˜ (Assets í…Œì´ë¸”ì—ì„œ ë¡œë“œí•´ì„œ UIì— ì „ë‹¬) */
 	UPROPERTY(BlueprintReadOnly, Category = "Summon")
-	TSoftObjectPtr<UTexture2D> FamiliarIcon; // FUnitBaseAssets¿¡ IconÀÌ ÀÖ´Ù°í °¡Á¤ÇÏ°Å³ª Ãß°¡ ÇÊ¿ä
+	TSoftObjectPtr<UTexture2D> FamiliarIcon; // FUnitBaseAssetsì— Iconì´ ìˆë‹¤ê³  ê°€ì •í•˜ê±°ë‚˜ ì¶”ê°€ í•„ìš”
 
-	/** @brief ºó ½½·ÔÀÎÁö ¿©ºÎ */
+	/** @brief ë¹ˆ ìŠ¬ë¡¯ì¸ì§€ ì—¬ë¶€ */
 	UPROPERTY(BlueprintReadOnly, Category = "Summon")
 	bool bIsSoldOut = true;
 };
 
-/** @brief ½½·Ô Á¤º¸°¡ °»½ÅµÇ¾úÀ» ¶§ UI¿¡ ¾Ë¸®´Â µ¨¸®°ÔÀÌÆ® */
+/** @brief ìŠ¬ë¡¯ ì •ë³´ê°€ ê°±ì‹ ë˜ì—ˆì„ ë•Œ UIì— ì•Œë¦¬ëŠ” ë¸ë¦¬ê²Œì´íŠ¸ */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSummonSlotsUpdated, const TArray<FSummonSlotInfo>&, Slots);
 
 /**
  * @class UFamiliarSummonComponent
- * @brief À¯´Ö ¼ÒÈ¯ ½Ã½ºÅÛÀ» °ü¸®ÇÏ´Â ÄÄÆ÷³ÍÆ®
+ * @brief ìœ ë‹› ì†Œí™˜ ì‹œìŠ¤í…œì„ ê´€ë¦¬í•˜ëŠ” ì»´í¬ë„ŒíŠ¸
  * @details
- * - 5°³ÀÇ ·£´ı À¯´Ö ½½·ÔÀ» °ü¸®.
- * - CostManageComponent¿Í ¿¬µ¿ÇÏ¿© À¯´Ö ¼ÒÈ¯ ½Ã ÄÚ½ºÆ® Â÷°¨ ¹× ÀÜ¾× È®ÀÎ.
+ * - 5ê°œì˜ ëœë¤ ìœ ë‹› ìŠ¬ë¡¯ì„ ê´€ë¦¬.
+ * - CostManageComponentì™€ ì—°ë™í•˜ì—¬ ìœ ë‹› ì†Œí™˜ ì‹œ ì½”ìŠ¤íŠ¸ ì°¨ê° ë° ì”ì•¡ í™•ì¸.
  */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PARADISE_API UFamiliarSummonComponent : public UActorComponent
@@ -56,63 +56,53 @@ protected:
 
 public:	
 	/**
-	* @brief ½½·Ô µ¥ÀÌÅÍ¸¦ ÃÊ±âÈ­ÇÏ°í 5°³¸¦ ·£´ıÀ¸·Î Ã¤¿ì´Â ÇÔ¼ö(°ÔÀÓ ½ÃÀÛ ½Ã)
+	* @brief ìŠ¬ë¡¯ ë°ì´í„°ë¥¼ ì´ˆê¸°í™”í•˜ê³  5ê°œë¥¼ ëœë¤ìœ¼ë¡œ ì±„ìš°ëŠ” í•¨ìˆ˜(ê²Œì„ ì‹œì‘ ì‹œ)
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Summon")
 	void RefreshAllSlots();
 
 	/**
-	* @brief Æ¯Á¤ ½½·Ô ±¸¸Å ¿äÃ» ÇÔ¼ö
-	* @param SlotIndex ¼ÒÈ¯ÇÒ ½½·ÔÀÇ ÀÎµ¦½º (0~4)
-	* @return ¼ÒÈ¯ ¼º°ø ¿©ºÎ(µ· ºÎÁ·, ½½·Ô ºñ¾îÀÖÀ½ µî ½ÇÆĞ½Ã false)
+	* @brief íŠ¹ì • ìŠ¬ë¡¯ êµ¬ë§¤ ìš”ì²­ í•¨ìˆ˜
+	* @param SlotIndex ì†Œí™˜í•  ìŠ¬ë¡¯ì˜ ì¸ë±ìŠ¤ (0~4)
+	* @return ì†Œí™˜ ì„±ê³µ ì—¬ë¶€(ëˆ ë¶€ì¡±, ìŠ¬ë¡¯ ë¹„ì–´ìˆìŒ ë“± ì‹¤íŒ¨ì‹œ false)
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Summon")
 	bool RequestPurchase(int32 SlotIndex);
 
-	/** @brief ÇöÀç ½½·Ô °»½Å µ¨¸®°ÔÀÌÆ® */
+	/** @brief í˜„ì¬ ìŠ¬ë¡¯ ê°±ì‹  ë¸ë¦¬ê²Œì´íŠ¸ */
 	UPROPERTY(BlueprintAssignable, Category = "Summon")
 	FOnSummonSlotsUpdated OnSummonSlotsUpdated;
 
 protected:
-	/** * @brief ¼ÒÈ¯ ¼º°ø ÈÄ Ç°Àı Ã³¸®ÇÏ°í ÄğÅ¸ÀÓ Å¸ÀÌ¸Ó ÇÔ¼ö
-	 * @param SlotIndex ºñ¿ö¾ß ÇÒ ½½·Ô ¹øÈ£
+	/** * @brief ì†Œí™˜ ì„±ê³µ í›„ í’ˆì ˆ ì²˜ë¦¬í•˜ê³  ì¿¨íƒ€ì„ íƒ€ì´ë¨¸ í•¨ìˆ˜
+	 * @param SlotIndex ë¹„ì›Œì•¼ í•  ìŠ¬ë¡¯ ë²ˆí˜¸
 	 */
 	UFUNCTION()
 	void ConsumeSpecificSlot(int32 SlotIndex);
 
-	/** * @brief Æ¯Á¤ ½½·ÔÀ» ´Ù½Ã Ã¤¿öÁÖ´Â ³»ºÎ ÇÔ¼ö (Å¸ÀÌ¸Ó¿¡ ÀÇÇØ È£ÃâµÊ)
-	 * @param SlotIndex ¸®ÇÊÇÒ ½½·Ô ¹øÈ£
+	/** * @brief íŠ¹ì • ìŠ¬ë¡¯ì„ ë‹¤ì‹œ ì±„ì›Œì£¼ëŠ” ë‚´ë¶€ í•¨ìˆ˜ (íƒ€ì´ë¨¸ì— ì˜í•´ í˜¸ì¶œë¨)
+	 * @param SlotIndex ë¦¬í•„í•  ìŠ¬ë¡¯ ë²ˆí˜¸
 	 */
 	UFUNCTION()
 	void RefillSpecificSlot(int32 SlotIndex);
 
-	/** * @brief ½ÇÁ¦ À¯´ÖÀ» ¿ÀºêÁ§Æ® Ç®¿¡¼­ ²¨³»°í ÃÊ±âÈ­ÇÏ´Â ÇÔ¼ö (¸®ÆÑÅä¸µ)
-	 * @param UnitID ¼ÒÈ¯ÇÒ À¯´ÖÀÇ ID (RowName)
-	 * @return ¼ÒÈ¯ ¼º°ø ½Ã À¯´Ö Æ÷ÀÎÅÍ ¹İÈ¯, ½ÇÆĞ ½Ã nullptr
-	 */
-	//class AFamiliarUnit* SpawnFamiliarUnit(FName UnitID);
-
-	/** @brief ·£´ı À¯´ÖÀ» ÇÏ³ª »ı¼ºÇÏ¿© ½½·Ô Á¤º¸¸¦ ¹İÈ¯ÇÔ 
-	* @return »ı¼ºµÈ ½½·Ô Á¤º¸ ±¸Á¶Ã¼ -> RefreshAllSlotsÇÔ¼ö¿¡¼­ ¹İº¹¹®À¸·Î ¹è¿­ »ı¼º
+	/** @brief ëœë¤ ìœ ë‹›ì„ í•˜ë‚˜ ìƒì„±í•˜ì—¬ ìŠ¬ë¡¯ ì •ë³´ë¥¼ ë°˜í™˜í•¨ 
+	* @return ìƒì„±ëœ ìŠ¬ë¡¯ ì •ë³´ êµ¬ì¡°ì²´ -> RefreshAllSlotsí•¨ìˆ˜ì—ì„œ ë°˜ë³µë¬¸ìœ¼ë¡œ ë°°ì—´ ìƒì„±
 	*/
 	FSummonSlotInfo GenerateRandomSlot(UDataTable* StatsTable, UDataTable* AssetsTable);
 
 protected:
-	/** @brief ¼ÒÈ¯ÇÒ ÆÛ¹Ğ¸®¾î Å¬·¡½º (BP_FamiliarUnit) */
-	//UPROPERTY(EditDefaultsOnly, Category = "Config")
-	//TSubclassOf<class AFamiliarUnit> FamiliarClass;
-
-	/** @brief ÇöÀç °ü¸® ÁßÀÎ ¼ÒÈ¯ ½½·Ôµé */
+	/** @brief í˜„ì¬ ê´€ë¦¬ ì¤‘ì¸ ì†Œí™˜ ìŠ¬ë¡¯ë“¤ */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State")
 	TArray<FSummonSlotInfo> CurrentSlots;
 
-	/** @brief ½½·Ô ÀÚµ¿ °»½Å ÄğÅ¸ÀÓ (ÃÊ ´ÜÀ§) */
+	/** @brief ìŠ¬ë¡¯ ìë™ ê°±ì‹  ì¿¨íƒ€ì„ (ì´ˆ ë‹¨ìœ„) */
 	UPROPERTY(EditDefaultsOnly, Category = "Config")
 	float RefillCooldownTime = 3.0f;
 
-	/** @brief ½½·Ôº° ¸®ÇÊ Å¸ÀÌ¸Ó ÇÚµé °ü¸®(5°³)*/
+	/** @brief ìŠ¬ë¡¯ë³„ ë¦¬í•„ íƒ€ì´ë¨¸ í•¸ë“¤ ê´€ë¦¬(5ê°œ)*/
 	FTimerHandle RefillTimers[5];
 
-	/** @brief ½½·Ô °³¼ö (±âº» 5°³) */
+	/** @brief ìŠ¬ë¡¯ ê°œìˆ˜ (ê¸°ë³¸ 5ê°œ) */
 	const int32 MaxSlotCount = 5;
 };

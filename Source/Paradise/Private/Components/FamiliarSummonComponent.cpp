@@ -178,7 +178,7 @@ FSummonSlotInfo UFamiliarSummonComponent::GenerateRandomSlot(UDataTable* StatsTa
 	{
 		NewSlot.FamiliarID = SelectedID;
 		NewSlot.FamiliarCost = Stats->SummonCost;
-		//NewSlot.UnitIcon = Assets->UnitIcon; // GameInstance에 있는 테이블 구조에 맞게 가져오기
+		//NewSlot.UnitIcon = Stats->UnitIcon; // 필요시
 		NewSlot.bIsSoldOut = false;
 	}
 	return NewSlot;
