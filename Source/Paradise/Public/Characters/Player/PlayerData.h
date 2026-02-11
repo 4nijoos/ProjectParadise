@@ -108,6 +108,8 @@ public:
 	UPROPERTY()
 	bool bIsDead =false;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FName CharacterID;
 	
 
 protected:
