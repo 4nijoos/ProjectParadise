@@ -13,30 +13,29 @@
 
 AMyAIController::AMyAIController()
 {
-    AIPerception = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception"));
-    SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
+	AIPerception = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception"));
+	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
 
-    if (SightConfig)
-    {
-        SightConfig->SightRadius = 800.f;
-        SightConfig->LoseSightRadius = 1000.f;
-        SightConfig->PeripheralVisionAngleDegrees = 90.f;
+	if (SightConfig)
+	{
+		SightConfig->SightRadius = 800.f;
+		SightConfig->LoseSightRadius = 1000.f;
+		SightConfig->PeripheralVisionAngleDegrees = 90.f;
+		SightConfig->DetectionByAffiliation.bDetectEnemies = true;
+		SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
+		SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
 
-        SightConfig->DetectionByAffiliation.bDetectEnemies = true;
-        SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
-        SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
+		if (AIPerception)
+		{
+			AIPerception->ConfigureSense(*SightConfig);
+			AIPerception->SetDominantSense(SightConfig->GetSenseImplementation());
+		}
+	}
 
-        if (AIPerception)
-        {
-            AIPerception->ConfigureSense(*SightConfig);
-            AIPerception->SetDominantSense(SightConfig->GetSenseImplementation());
-        }
-    }
-
-    if (AIPerception)
-    {
-        AIPerception->OnTargetPerceptionUpdated.AddDynamic(this, &AMyAIController::OnTargetDetected);
-    }
+	if (AIPerception)
+	{
+		AIPerception->OnTargetPerceptionUpdated.AddDynamic(this, &AMyAIController::OnTargetDetected);
+	}
 }
 
 void AMyAIController::OnPossess(APawn* InPawn)

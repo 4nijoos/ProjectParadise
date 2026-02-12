@@ -84,7 +84,11 @@ void AUnitSpawner::SpawnUnit()
 				if (!AssetData->BehaviorTree.IsNull())
 				{
 					UBehaviorTree* BT = AssetData->BehaviorTree.LoadSynchronous();
-					if (BT) AIC->RunBehaviorTree(BT);
+					if (BT)
+					{
+						AIC->RunBehaviorTree(BT);
+						UE_LOG(LogTemp, Log, TEXT("🚀 [%s] Behavior Tree Started Successfully."), *NewUnit->GetName());
+					}
 				}
 			}
 		}

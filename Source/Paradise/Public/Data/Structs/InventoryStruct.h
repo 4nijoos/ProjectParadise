@@ -3,16 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Data/Enums/GameEnums.h"
 #include "InventoryStruct.generated.h"
 
 /**
- * @brief 보유 영웅 데이터 (Level, Exp, 돌파 수치 등 성장 정보 포함)
+ * @brief 보유 영웅 데이터 (Level, Exp, ,장비장착 정보, 돌파 수치 등 성장 정보 포함)
  * @details 임시 구조체
  */
 USTRUCT(BlueprintType)
 struct FOwnedCharacterData
 {
 	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGuid CharacterUID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName CharacterID; // 데이터 에셋 ID (RowName)
@@ -22,6 +26,12 @@ struct FOwnedCharacterData
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 AwakeningLevel = 0; // 초월/각성 단계
+
+	// Key: 장비 슬롯 (Weapon, Helmet 등)
+	// Value: 장착된 아이템의 고유 ID (ItemUID)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<EEquipmentSlot, FGuid> EquipmentMap;
+
 };
 
 /**
@@ -33,6 +43,9 @@ USTRUCT(BlueprintType)
 struct FOwnedFamiliarData
 {
 	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGuid FamiliarUID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName FamiliarID;
@@ -54,6 +67,9 @@ struct FOwnedItemData
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGuid ItemUID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName ItemID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -61,4 +77,10 @@ struct FOwnedItemData
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Quantity = 1; // 갯수
+
+	FOwnedItemData()
+	{
+		ItemUID = FGuid();
+	}
 };
+

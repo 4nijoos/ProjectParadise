@@ -4,14 +4,16 @@
 #include "Framework/InGame/InGamePlayerState.h"
 #include "Engine/DataTable.h"
 #include "Components/InventoryComponent.h"
+#include "Components/EquipmentComponent.h"
 #include "Components/CostManageComponent.h"
+#include "Components/FamiliarSummonComponent.h"
 #include "Framework/Core/ParadiseGameInstance.h"
 #include "Characters/Player/PlayerData.h"
 
 AInGamePlayerState::AInGamePlayerState()
 {
-    InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
     CostManageComponent = CreateDefaultSubobject<UCostManageComponent>(TEXT("CostManageComponent"));
+    FamiliarSummonComponent = CreateDefaultSubobject<UFamiliarSummonComponent>(TEXT("FamiliarSummonComponent"));
 }
 
 void AInGamePlayerState::BeginPlay()
@@ -24,9 +26,9 @@ void AInGamePlayerState::BeginPlay()
 
 void AInGamePlayerState::InitSquad(const TArray<FName>& StartingHeroIDs)
 {
- 
-    UParadiseGameInstance* GI = Cast<UParadiseGameInstance>(GetGameInstance());
-    if (!GI) return;
+
+    UInventoryComponent* MainInv = GetInventoryComponent();
+    if (!MainInv) return;
 
     for (const FName& HeroID : StartingHeroIDs)
     {
@@ -35,15 +37,30 @@ void AInGamePlayerState::InitSquad(const TArray<FName>& StartingHeroIDs)
         APlayerData* NewSoul = GetWorld()->SpawnActor<APlayerData>(PlayerDataClass);
         if (NewSoul)
         {
-            //HeroID 로 GI 에서 조회해서 초기화
+            //HeroID로 초기화
             NewSoul->InitPlayerData(HeroID);
 
-            // 스쿼드에 추가
+            //인벤토리 연결
+            if (UEquipmentComponent* EquipComp = NewSoul->GetEquipmentComponent())
+            {
+                EquipComp->SetLinkedInventory(MainInv);
+
+                UE_LOG(LogTemp, Log, TEXT("🔗 [SquadInit] %s에게 인벤토리 연결 완료"), *HeroID.ToString());
+            }
             SquadMembers.Add(NewSoul);
         }
     }
 
     UE_LOG(LogTemp, Log, TEXT("✅ [PlayerState] 스쿼드 초기화 완료 (%d명)"), SquadMembers.Num());
+}
+
+UInventoryComponent* AInGamePlayerState::GetInventoryComponent() const
+{
+    if (UParadiseGameInstance* GI = Cast<UParadiseGameInstance>(GetGameInstance()))
+    {
+        return GI->GetMainInventory();
+    }
+    return nullptr;
 }
 
 APlayerData* AInGamePlayerState::GetSquadMemberData(int32 Index) const

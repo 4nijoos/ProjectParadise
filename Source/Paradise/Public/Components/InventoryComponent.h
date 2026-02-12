@@ -3,8 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Data/Structs/ItemStructs.h"
+#include "Data/Structs/UnitStructs.h"
+#include "Data/Structs/InventoryStruct.h"
 #include "Components/ActorComponent.h"
 #include "InventoryComponent.generated.h"
+
+#pragma region 델리게이트 선언
 
 /**
  * @brief 인벤토리 변경 알림 델리게이트
@@ -12,6 +17,13 @@
  */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryUpdated);
 
+/**
+ * @brief 장비 상태 변경 알림 델리게이트
+ * @details 장착/해제로 인해 장비 상태가 변했을 때 UI 갱신 등을 위해 호출됩니다.
+ */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEquipmentUpdated);
+
+#pragma endregion 델리게이트 선언
 
 /**
  * @class UCMP_Inventory
@@ -29,6 +41,24 @@ class PARADISE_API UInventoryComponent : public UActorComponent
 public:	
 	UInventoryComponent();
 
+	#pragma region 장비 관련 함수 선언
+	/**
+	 * @brief 특정 캐릭터(UID 기반)에게 장비를 장착시킵니다.
+	 * @param CharacterUID : 장비를 착용할 캐릭터의 고유 ID (FGuid)
+	 * @param ItemUID : 장착할 아이템의 GUID
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Inventory|Equipment")
+	void EquipItemToCharacter(FGuid CharacterUID, FGuid ItemUID);
+
+	/**
+	 * @brief 특정 캐릭터(UID 기반)의 특정 슬롯 장비를 해제합니다.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Inventory|Equipment")
+	void UnEquipItemFromCharacter(FGuid CharacterUID, EEquipmentSlot Slot);
+
+	#pragma endregion 장비 관련 함수 선언
+
+	#pragma region 인벤토리 관련 함수 선언
 	/**
 	 * @brief 계정 데이터로부터 인벤토리를 초기화하는 함수 (구조체 현재 미구현 타입변경예정)
 	 * @details GameInstance(SaveFile)에 저장된 배열을 그대로 복사하여 가져옵니다.
@@ -50,16 +80,7 @@ public:
 	 * @param Count 추가할 개수 (기본값 1)
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Inventory|Modify")
-	void AddItem(FName ItemID, int32 Count = 1);
-
-	/**
-	 * @brief 아이템을 소모(삭제)하는 함수
-	 * @param ItemID 소모할 아이템의 ID
-	 * @param Count 소모할 개수
-	 * @return bool 성공 시 true, 수량이 부족하거나 없으면 false
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Inventory|Modify")
-	bool RemoveItem(FName ItemID, int32 Count = 1);
+	void AddItem(FName ItemID, int32 Count = 1, int32 EnhancementLvl = 0);
 
 	/**
 	 * @brief 영웅을 획득하는 함수
@@ -76,15 +97,20 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory|Modify")
 	void AddFamiliar(FName FamiliarID);
 
-	/**
-	 * @brief [Debug] 테스트 아이템을 추가하고 전체 목록을 출력합니다.
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Debug")
-	void Debug_TestInventory();
+	/** * @brief 통합 삭제 함수
+		* @details 인벤토리 내의 영웅, 병사, 아이템을 모두 뒤져서 해당 GUID를 가진 객체를 삭제합니다.
+		* @return 성공 시 true
+		*/
+	UFUNCTION(BlueprintCallable, Category = "Inventory|Unified")
+	bool RemoveObjectByGUID(FGuid TargetGUID, int32 Count = 1);
+
+	#pragma endregion 인벤토리 관련 함수 선언
+
+	#pragma region 헬퍼 함수 선언
 
 	/** @return 현재 보유 중인 모든 영웅 목록 (const 참조) */
 	UFUNCTION(BlueprintPure, Category = "Inventory|Query")
-	const TArray<FOwnedCharacterData>& GetOwnedHeroes() const { return OwnedCharacters; }
+	const TArray<FOwnedCharacterData>& GetOwnedCharacters() const { return OwnedCharacters; }
 
 	/** @return 현재 보유 중인 모든 퍼밀리어 목록 (const 참조) */
 	UFUNCTION(BlueprintPure, Category = "Inventory|Query")
@@ -94,6 +120,11 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Inventory|Query")
 	const TArray<FOwnedItemData>& GetOwnedItems() const { return OwnedItems; }
 
+	/**
+	 * @brief GUID로 아이템 데이터 포인터 반환 (장비 장착 시 필수)
+	 * @return 찾지 못하면 nullptr
+	 */
+	FOwnedItemData* GetItemByGUID(FGuid TargetUID);
 
 	/**
 	 * @brief 특정 아이템의 현재 보유 개수를 반환합니다.
@@ -103,7 +134,21 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Inventory|Query")
 	int32 GetItemQuantity(FName ItemID) const;
 
-protected:                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+	/**
+	 * @brief 특정 영웅을 보유하고 있는지 확인
+	 */
+	UFUNCTION(BlueprintPure, Category = "Inventory|Query")
+	bool HasCharacter(FName CharacterID) const;
+
+	/**
+	 * @brief 아이템 ID를 기반으로 장착되어야 할 슬롯을 찾습니다.
+	 * @details 무기/방어구 테이블을 조회하고 태그를 비교합니다.
+	 */
+	EEquipmentSlot FindEquipmentSlot(FName ItemID) const;
+
+	#pragma endregion 헬퍼 함수 선언
+
+protected:
 	virtual void BeginPlay() override;
 
 
@@ -114,20 +159,23 @@ private:
 
 public:
 
-	/**
-	 * @brief 아이템 정보가 담긴 데이터 테이블 ( 이후에 구현된 데이터 테이블로 변경예정 )
-	 * @details AddItem 호출 시, 이 테이블에 존재하는 ID인지 검증하는 용도로 사용됩니다.
-	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Config")
-	TObjectPtr<UDataTable> ItemDataTable;
+#pragma region 델리게이트
 
 	/** * @brief 인벤토리 변경 시 호출되는 델리게이트 (UI)
 	 */
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnInventoryUpdated OnInventoryUpdated;
 
+
+	/** * @brief 장비 변경 시 호출되는 이벤트 (UI 갱신용)
+	 */
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnEquipmentUpdated OnEquipmentUpdated;
+
+#pragma endregion 델리게이트
 protected:
 
+#pragma region 인벤토리 보유 변수
 	/** [영웅] 지휘관이 보유한 영웅들 (ID, Level, Awakening) */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory|Storage")
 	TArray<FOwnedCharacterData> OwnedCharacters;
@@ -139,6 +187,8 @@ protected:
 	/** [아이템] 보유한 장비 및 소모품 (ID, Enhancement, Quantity) */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory|Storage")
 	TArray<FOwnedItemData> OwnedItems;
+
+#pragma endregion 인벤토리 보유 변수
 
 private:
 
