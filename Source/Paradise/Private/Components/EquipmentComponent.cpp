@@ -28,6 +28,108 @@ void UEquipmentComponent::SetLinkedInventory(UInventoryComponent* InInventory)
 
 void UEquipmentComponent::TestEquippedItem(EEquipmentSlot Slot, FName ItemID)
 {
+	if (!LinkedInventory)
+	{
+		UE_LOG(LogTemp, Error, TEXT("❌ [TestEquippedItem] 인벤토리 컴포넌트가 연결되지 않았습니다."));
+		return;
+	}
+
+	if (ItemID.IsNone()) return;
+
+	APlayerData* OwnerData = Cast<APlayerData>(GetOwner());
+	if (!OwnerData) return;
+
+	FName MyHeroID = OwnerData->CharacterID;
+	FGuid MyCharUID;
+
+	for (const FOwnedCharacterData& CharData : LinkedInventory->GetOwnedCharacters())
+	{
+		if (CharData.CharacterID == MyHeroID)
+		{
+			MyCharUID = CharData.CharacterUID;
+			break;
+		}
+	}
+
+	//캐릭터가 없으면 생성해서라도 UID 확보
+	if (!MyCharUID.IsValid())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("⚠️ [Debug] 캐릭터가 없어 강제 생성합니다: %s"), *MyHeroID.ToString());
+		LinkedInventory->AddCharacter(MyHeroID);
+
+		// 다시 검색
+		for (const FOwnedCharacterData& CharData : LinkedInventory->GetOwnedCharacters())
+		{
+			if (CharData.CharacterID == MyHeroID)
+			{
+				MyCharUID = CharData.CharacterUID;
+				break;
+			}
+		}
+	}
+
+	//아이템 UID 찾기
+	FGuid TargetItemUID;
+
+	// 인벤토리에 해당 ID의 아이템이 있는지 검색
+	const TArray<FOwnedItemData>& Items = LinkedInventory->GetOwnedItems();
+	for (const FOwnedItemData& Item : Items)
+	{
+		if (Item.ItemID == ItemID)
+		{
+			TargetItemUID = Item.ItemUID;
+			break; // 하나라도 있으면 그거 씀
+		}
+	}
+
+	// 디버그코드 이므로 강제로 인벤토리추가 
+	if (!TargetItemUID.IsValid())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("⚠️ [Debug] 인벤토리에 아이템이 없어 강제 생성합니다: %s"), *ItemID.ToString());
+		LinkedInventory->AddItem(ItemID, 1);
+
+		// 방금 만든거 다시 찾기
+		const TArray<FOwnedItemData>& NewItems = LinkedInventory->GetOwnedItems();
+		for (int32 i = NewItems.Num() - 1; i >= 0; --i)
+		{
+			if (NewItems[i].ItemID == ItemID)
+			{
+				TargetItemUID = NewItems[i].ItemUID;
+				break;
+			}
+		}
+	}
+
+	if (!TargetItemUID.IsValid())
+	{
+		UE_LOG(LogTemp, Error, TEXT("❌ [Debug] 아이템 생성 실패 (데이터 테이블에 없는 ID일 수 있음): %s"), *ItemID.ToString());
+		return;
+	}
+
+	//위에서 강제로 만들었으므로 무조건 통과
+	LinkedInventory->EquipItemToCharacter(MyCharUID, TargetItemUID);
+
+	//비주얼 강제 업데이트
+	APlayerBase* VisualTarget =  nullptr;
+
+	// 타겟이 명시되지 않았다면 PlayerData가 알고 있는 현재 아바타 사용
+	if (OwnerData->CurrentAvatar.IsValid())
+	{
+		VisualTarget = Cast<APlayerBase>(OwnerData->CurrentAvatar.Get());
+	}
+
+	if (VisualTarget)
+	{
+		for (const FOwnedCharacterData& CharData : LinkedInventory->GetOwnedCharacters())
+		{
+			if (CharData.CharacterUID == MyCharUID)
+			{
+				InitializeEquipment(CharData.EquipmentMap, LinkedInventory);
+				UE_LOG(LogTemp, Log, TEXT("💪 [Debug] %s 장착 및 비주얼 갱신 완료!"), *ItemID.ToString());
+				break;
+			}
+		}
+	}
 }
 
 void UEquipmentComponent::InitializeEquipment(const TMap<EEquipmentSlot, FGuid>& InEquipmentMap, UInventoryComponent* InInventory)
